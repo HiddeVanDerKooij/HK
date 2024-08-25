@@ -1,0 +1,29 @@
+add_library(HK
+	Allocators/Memory.cpp
+	Allocators/Memory.h
+	Allocators/Pool.h
+	Allocators/StringPool.cpp
+	Allocators/StringPool.h
+    Common/CompilerMacros.cpp
+    Common/CompilerMacros.h
+    Common/Math.cpp
+    Common/Math.h
+    Common/Types.cpp
+    Common/Types.h
+    Common/Print.cpp
+    Common/Print.h
+	Containers/View/ArrayView.cpp
+	Containers/View/ArrayView.h
+	Containers/View/StringView.cpp
+	Containers/View/StringView.h
+	Containers/Array.cpp
+	Containers/Array.h
+	Strings/String.h
+	Strings/String.cpp
+	Util/DualType.h
+	Util/DualType.cpp
+	Util/ErrorOr.h
+	Util/Out.h
+	Util/Out.cpp)
+
+target_include_directories(HK PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
