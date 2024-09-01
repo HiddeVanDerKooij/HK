@@ -32,6 +32,10 @@ namespace Memory {
 
 	void Move(const void* from, void* to, uint64 numBytes);
 	void Copy(const void* from, void* to, uint64 numBytes);
+	template<typename T>
+	void Copy(const T* from, T* to) {
+		Copy(from, to, sizeof(T));
+	};
 
 	bool Equals(const void* a, const void* b, uint64 numBytes);
 	// TODO (HvdK): Make special aligned versions of these functions
@@ -60,3 +64,22 @@ template<typename T>
 typename RemoveReference<T>::Type&& Move(T&& arg) noexcept {
 	return static_cast<typename RemoveReference<T>::Type&&>(arg);
 }
+
+template<typename T>
+T&& Forward(typename RemoveReference<T>::Type& arg) noexcept {
+	return static_cast<T&&>(arg);
+}
+
+template<typename T>
+T&& Forward(typename RemoveReference<T>::Type&& arg) noexcept {
+	return static_cast<T&&>(arg);
+}
+
+template<typename T>
+void Swap(T& a, T& b) {
+	T temp = Move(a);
+	a = Move(b);
+	b = Move(temp);
+}
+
+#define OFFSET_OF(type, member) static_cast<uint32>(reinterpret_cast<uintptr>(&(((type*)0)->member)))

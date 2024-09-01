@@ -10,3 +10,7 @@ STATIC_CHECK(sizeof(uint16) == 2);
 STATIC_CHECK(sizeof(int8) == 1);
 STATIC_CHECK(sizeof(uint8) == 1);
 STATIC_CHECK(sizeof(size64) == 8);
+STATIC_CHECK(sizeof(f64) == 8);
+STATIC_CHECK(sizeof(f32) == 4);
+STATIC_CHECK(sizeof(char8) == 1);
+STATIC_CHECK(sizeof(uintptr) == 8);

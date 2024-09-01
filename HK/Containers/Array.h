@@ -18,6 +18,9 @@ static uint32 CalculateArrayMaxGrowth(uint32 oldcap, uint32 newcap)
 	if (oldcap >= newcap) {
 		return oldcap;
 	}
+	if (UNLIKELY(newcap < 5)) {
+		newcap = 5;
+	}
 	return newcap;
 };
 
@@ -67,6 +70,13 @@ public:
 
 	T* GetData();
 	const T* GetData() const;
+	
+	T* begin() { return Data; }
+	T* end() { return Data + ArrayNum; }
+	const T* begin() const { return Data; }
+	const T* end() const { return Data + ArrayNum; }
+	
+	void Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, const typename RemoveReference<T>::Type& b));
 
 private:
 	void InitEmpty();
@@ -74,6 +84,8 @@ private:
 	void Allocate(uint32 cap);
 	void Reallocate(uint32 cap);
 	void Free();
+	
+	void DestroyAt(uint32 position);
 protected:
 	T* Data;
 	uint32 ArrayNum;
@@ -141,6 +153,7 @@ Array<T>::Array(ArrayView<T> other)
 template<typename T>
 Array<T>::~Array()
 {
+	Reset();
 	if (LIKELY(Data != nullptr))
 		Free();
 }
@@ -162,8 +175,11 @@ void Array<T>::Add(T&& item)
 template<typename T>
 void Array<T>::Reset()
 {
-	// TODO (HvdK): Consider running destructors
-	ArrayNum = 0;
+	while (ArrayNum > 0)
+	{
+		DestroyAt(ArrayNum-1);
+		--ArrayNum;
+	}
 }
 
 template<typename T>
@@ -213,6 +229,8 @@ template<typename T>
 void Array<T>::RemoveAt(uint32 index)
 {
 	CHECK(IsValidIndex(index));
+	
+	DestroyAt(index);
 
 	--ArrayNum;
 
@@ -226,6 +244,8 @@ template<typename T>
 void Array<T>::RemoveAtSwap(uint32 index)
 {
 	CHECK(IsValidIndex(index));
+
+	DestroyAt(index);
 
 	--ArrayNum;
 
@@ -335,6 +355,21 @@ const T* Array<T>::GetData() const
 }
 
 template<typename T>
+void Array<T>::Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, const typename RemoveReference<T>::Type& b))
+{
+	// TODO (HvdK): Use a more efficient sorting algorithm
+	for (uint32 i = 0; i < ArrayNum; ++i) {
+		for (uint32 j = ArrayNum - 1; j > i; --j) {
+			if (compare(Data[j], Data[i]) < 0) {
+				T tmp = Move(Data[i]);
+				Data[i] = Move(Data[j]);
+				Data[j] = Move(tmp);
+			}
+		}
+	}
+}
+
+template<typename T>
 void Array<T>::InitEmpty()
 {
 	Data = nullptr;
@@ -369,4 +404,12 @@ void Array<T>::Free()
 {
 	CHECK(Data != nullptr);
 	Memory::Free(Data, ArrayMax * ElementSize);
+}
+
+template<typename T>
+void Array<T>::DestroyAt(uint32 index)
+{
+	CHECK(IsValidIndex(index));
+	
+	Data[index].~T();
 }

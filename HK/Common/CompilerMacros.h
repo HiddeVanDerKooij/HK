@@ -1,6 +1,6 @@
 #pragma once
 
-void AssertIfFailed(bool bSuccess);
+#define AssertIfFailed(success) {if (!(success)) { BREAK; }}
 
 // Normalizing definitions passed into the build system
 
@@ -115,6 +115,8 @@ void AssertIfFailed(bool bSuccess);
 #define __ASSUME_IMPL(x)			AssertIfFailed(LIKELY(x))
 #undef __DBG_INCREMENT_IMPL
 #define __DBG_INCREMENT_IMPL(x)	++(x)
+#undef __UNREACHABLE_IMPL
+#define __UNREACHABLE_IMPL			AssertIfFailed(false)
 
 #endif
 

@@ -3,7 +3,12 @@
 #include "Allocators/Memory.h"
 #include "Common/CompilerMacros.h"
 
-char8 Buffer[16] = { '\0' };
+uint8 CurrentBuffer = 0;
+char8 Buffer[16][256] = { '\0' };
+
+Format::__HexUint16 Format::AsHex(uint16 value) {
+    return *reinterpret_cast<__HexUint16*>(&value);
+}
 
 AnsiString::AnsiString() : Array<char8>() {}
 
@@ -147,27 +152,27 @@ static StringView ConvertInteger(uint64 v, char8* b) {
         v /= 10;
     } while (v != 0);
 
-    uint32 l = uint32(t - Buffer);
+    uint32 l = uint32(t - Buffer[CurrentBuffer]);
 
     while (b < t) {
         char8 c = *b;
         *b++ = *t;
         *t-- = c;
     }
-    return StringView(Buffer, l);
+    return StringView(Buffer[CurrentBuffer++], l);
 }
 
 static StringView ConvertSignedInteger(int64 v) {
     if (v < 0) {
-        Buffer[0] = '-';
-        return ConvertInteger(-v, Buffer + 1);
+        Buffer[CurrentBuffer][0] = '-';
+        return ConvertInteger(-v, Buffer[CurrentBuffer] + 1);
     } else {
-        return ConvertInteger(v, Buffer);
+        return ConvertInteger(v, Buffer[CurrentBuffer]);
     }
 }
 
 static StringView ConvertUnsignedInteger(uint64 v) {
-    return ConvertInteger(v, Buffer);
+    return ConvertInteger(v, Buffer[CurrentBuffer]);
 }
 
 StringView AnsiString::ConvertParam(int8 v) {
@@ -200,4 +205,21 @@ StringView AnsiString::ConvertParam(int64 v) {
 
 StringView AnsiString::ConvertParam(uint64 v) {
     return ConvertUnsignedInteger(v);
+}
+
+StringView AnsiString::ConvertParam(Format::__HexUint16 v) {
+    char8* t = Buffer[CurrentBuffer];
+    *t++ = '0';
+    *t++ = 'x';
+    
+    uint16 m = 0b1111;
+    
+    const char8* hex = "0123456789ABCDEF";
+    
+    for (uint32 i = 0; i < 4; ++i) {
+        uint16 cm = m << ((3 - i) * 4);
+        uint16 c = (v.value & cm) >> ((3-i) * 4);
+        *t++ = hex[c];
+    }
+    return StringView(Buffer[CurrentBuffer++], 6);
 }

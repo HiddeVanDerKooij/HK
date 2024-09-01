@@ -18,6 +18,8 @@ add_library(HK
 	Containers/View/StringView.h
 	Containers/Array.cpp
 	Containers/Array.h
+	Containers/BitArray.cpp
+	Containers/BitArray.h
 	Strings/String.h
 	Strings/String.cpp
 	Util/DualType.h

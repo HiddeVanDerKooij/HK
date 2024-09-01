@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Types.h"
+#include "Containers/View/StringView.h"
 
 template<typename T> class Array;
 
@@ -15,7 +16,6 @@ protected:
 	void CheckIndex(uint32 index) const;
 
 	const void* ArrayData;
-private:
 	uint32 ArraySize;
 };
 

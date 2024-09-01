@@ -6,6 +6,11 @@
 
 // TODO (HvdK): UTF-8
 
+namespace Format {
+    struct __HexUint16 { uint16 value; };
+    __HexUint16 AsHex(uint16 value);
+};
+
 class AnsiString : protected Array<char8> {
 public:
     AnsiString();
@@ -85,9 +90,11 @@ protected:
     static StringView ConvertParam(uint32 v);
     static StringView ConvertParam(int64 v);
     static StringView ConvertParam(uint64 v);
-    static StringView ConvertParam(float v);
-    static StringView ConvertParam(double v);
+    static StringView ConvertParam(f32 v);
+    static StringView ConvertParam(f64 v);
     static StringView ConvertParam(bool v);
+    
+    static StringView ConvertParam(Format::__HexUint16 v);
 };
 
 typedef AnsiString String;
