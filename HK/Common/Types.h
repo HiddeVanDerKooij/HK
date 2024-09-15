@@ -17,7 +17,7 @@ typedef double f64;
 typedef int8 char8;
 
 typedef size_t size64;
-typedef long unsigned int uintptr;
+typedef uint64 uintptr;
 
 
 constexpr uint32 INVALID_INDEX = 0xFFFFFFFF;

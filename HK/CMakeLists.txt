@@ -20,6 +20,8 @@ add_library(HK
 	Containers/Array.h
 	Containers/BitArray.cpp
 	Containers/BitArray.h
+	File/File.h
+	File/FileWindows.cpp
 	Strings/String.h
 	Strings/String.cpp
 	Util/DualType.h

@@ -77,6 +77,8 @@ public:
 	const T* end() const { return Data + ArrayNum; }
 	
 	void Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, const typename RemoveReference<T>::Type& b));
+	
+	bool Contains(const T& value, uint32* result = nullptr) const;
 
 private:
 	void InitEmpty();
@@ -367,6 +369,21 @@ void Array<T>::Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, 
 			}
 		}
 	}
+}
+
+template<typename T>
+bool Array<T>::Contains(const T& value, uint32* result) const
+{
+	for (uint32 i = ArrayNum; i>0;)
+	{
+		--i;
+		if (UNLIKELY(Data[i] == value)) {
+			if (result)
+				*result = i;
+			return true;
+		}
+	}
+	return false;
 }
 
 template<typename T>

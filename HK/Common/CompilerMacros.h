@@ -4,6 +4,10 @@
 
 // Normalizing definitions passed into the build system
 
+#define PLATFORM_WINDOWS 0
+#define PLATFORM_LINUX 1
+#define PLATFORM_UNKNOWN 2
+
 #ifdef _DEBUG_
 #define DEBUG_BUILD
 #define BUILD_TYPE "DEBUG"
@@ -17,11 +21,13 @@
 #ifdef _MSC_VER
 #define MSVC
 #define COMPILER_VENDOR "MSVC"
+#define PLATFORM PLATFORM_WINDOWS
 #endif
 
 #ifdef __GNUC__
 #define GCC
 #define COMPILER_VENDOR "GCC"
+#define PLATFORM PLATFORM_LINUX
 #endif
 
 // Compiler specific macros
@@ -88,10 +94,10 @@
 #define __UNREACHABLE_IMPL {}
 #endif
 #ifndef __PACK_START_IMPL
-#define __PACK_START_IMPL {}
+#define __PACK_START_IMPL 
 #endif
 #ifndef __PACK_END_IMPL
-#define __PACK_END_IMPL {}
+#define __PACK_END_IMPL 
 #endif
 #ifndef __DBG_INCREMENT_IMPL
 #define __DBG_INCREMENT_IMPL(x) {}
@@ -130,6 +136,9 @@
 #define XSTR(x)					STR(x)
 #define CONCATENATE(x, y)		x##y
 
+#ifndef PLATFORM
+#define PLATFORM PLATFORM_UNKNOWN
+#endif
 
 // Release specific macros
 
