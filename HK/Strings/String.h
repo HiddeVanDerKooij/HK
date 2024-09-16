@@ -29,6 +29,12 @@ public:
     AnsiString operator+(StringView other);
     const char8* operator*();
     const char8* operator*() const;
+    bool operator==(const AnsiString& other) const;
+    bool operator!=(const AnsiString& other) const;
+    bool operator==(const StringView& other) const;
+    bool operator!=(const StringView& other) const;
+    
+    uint32 Size() const;
 
     void Append(StringView view);
 

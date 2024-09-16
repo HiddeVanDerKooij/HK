@@ -153,7 +153,7 @@ bool StringView::ParseAsInt(int64& result, uint32 base) const
 	return true;
 }
 
-StringView operator""_sv(const char8* string, size64 size)
+const StringView operator""_sv(const char8* string, size64 size)
 {
 	return StringView(string, static_cast<uint32>(size));
 };

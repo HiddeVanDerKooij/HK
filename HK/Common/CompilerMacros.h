@@ -8,14 +8,20 @@
 #define PLATFORM_LINUX 1
 #define PLATFORM_UNKNOWN 2
 
+#define BUILD_TYPE_DEBUG 0
+#define BUILD_TYPE_RELEASE 1
+#define BUILD_TYPE_UNKNOWN 2
+
 #ifdef _DEBUG_
 #define DEBUG_BUILD
-#define BUILD_TYPE "DEBUG"
+#define BUILD_TYPE_STR "DEBUG"
+#define BUILD_TYPE BUILD_TYPE_DEBUG
 #endif
 
 #ifdef _RELEASE_
 #define RELEASE_BUILD
-#define BUILD_TYPE "RELEASE"
+#define BUILD_TYPE_STR "RELEASE"
+#define BUILD_TYPE BUILD_TYPE_RELEASE
 #endif
 
 #ifdef _MSC_VER
@@ -28,6 +34,11 @@
 #define GCC
 #define COMPILER_VENDOR "GCC"
 #define PLATFORM PLATFORM_LINUX
+#endif
+
+#ifndef BUILD_TYPE
+#define BUILD_TYPE BUILD_TYPE_UNKNOWN
+#define BUILD_TYPE_STR "UNKNOWN"
 #endif
 
 // Compiler specific macros
@@ -131,7 +142,7 @@
 #define CHECK(x)				ASSERT(x)
 #define STATIC_CHECK(x)			static_assert(x, #x)
 #define __BS                    CONCATENATE(COMPILER_VENDOR, "_")
-#define BUILD_STRING			(BUILD_TYPE "_" COMPILER_VENDOR)
+#define BUILD_STRING			(BUILD_TYPE_STR "_" COMPILER_VENDOR)
 #define STR(x)					#x
 #define XSTR(x)					STR(x)
 #define CONCATENATE(x, y)		x##y

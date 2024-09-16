@@ -87,6 +87,27 @@ const char8* AnsiString::operator*() const {
 	return AsCString();
 }
 
+bool AnsiString::operator==(const AnsiString& other) const
+{
+	return AsView() == other.AsView();
+}
+bool AnsiString::operator!=(const AnsiString& other) const
+{
+	return AsView() != other.AsView();
+}
+bool AnsiString::operator==(const StringView& other) const
+{
+	return AsView() == other;
+}
+bool AnsiString::operator!=(const StringView& other) const
+{
+	return AsView() != other;
+}
+
+uint32 AnsiString::Size() const {
+	return ArrayNum;
+}
+
 void AnsiString::Append(StringView view) {
 	RequireArrayMaxGrowth(ArrayNum + view.Size());
 	Memory::Copy(view.Data(), Data + ArrayNum, view.Size());

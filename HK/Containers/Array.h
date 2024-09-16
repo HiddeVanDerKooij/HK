@@ -33,7 +33,27 @@ public:
 	Array(const Array& other);
 	Array(Array&& other);
 	Array(ArrayView<T> other);
+	
 	~Array();
+	
+	template<typename... Args>
+	static Array<T> CreateFrom(const Args&... args) {
+		Array<T> result;
+		result.AddAll(args...);
+		return result;
+	};
+	
+	template<typename Arg, class... Args>
+	void AddAll(const Arg& arg, const Args&... args) {
+		Add(arg);
+		AddAll(args...);
+	};
+	
+	template<typename Arg>
+	void AddAll(const Arg& arg) {
+		Add(arg);
+	};
+	
 
 	void Add(const T& item);
 	void Add(T&& item);
@@ -77,6 +97,7 @@ public:
 	const T* end() const { return Data + ArrayNum; }
 	
 	void Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, const typename RemoveReference<T>::Type& b));
+	bool FindWithPredicate(bool (*predicate)(const T& item), uint32* result) const;
 	
 	bool Contains(const T& value, uint32* result = nullptr) const;
 
@@ -369,6 +390,19 @@ void Array<T>::Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, 
 			}
 		}
 	}
+}
+
+template<typename T>
+bool Array<T>::FindWithPredicate(bool (*predicate)(const T& item), uint32* result) const
+{
+	for (uint32 i = 0; i < ArrayNum; ++i) {
+		if (predicate(Data[i])) {
+			if (result)
+				*result = i;
+			return true;
+		}
+	}
+	return false;
 }
 
 template<typename T>

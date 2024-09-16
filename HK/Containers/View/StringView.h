@@ -36,4 +36,4 @@ private:
 	uint32 StringSize;
 };
 
-StringView operator""_sv(const char8* string, size64 size);
+const StringView operator""_sv(const char8* string, size64 size);
