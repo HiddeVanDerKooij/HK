@@ -1,18 +1,21 @@
 #include "Common/CompilerMacros.h"
 #include "File.h"
 
-#if PLATFORM == PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_LINUX
 
-#include <windows.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 void FilePath::Canonicalize() {
-	CanonicalizeBackwardSlash();
+	CanonicalizeForwardSlash();
 }
 
 File::File(const FilePath& path) {
 	
 	Path = path;
-	FileHandle = nullptr;
+	FileHandle = 0;
 	FileSize = 0;
 	FilePos = 0;
 	bOpenRead = false;
@@ -22,10 +25,10 @@ File::File(const FilePath& path) {
 }
 
 File::~File() {
-	if (FileHandle) {
-		CloseHandle(FileHandle);
+	if (!!FileHandle) {
+		close(FileHandle);
 	}
-	FileHandle = nullptr;
+	FileHandle = 0;
 }
 
 bool File::Create(bool bReadOnly) {
@@ -33,22 +36,24 @@ bool File::Create(bool bReadOnly) {
 		return false;
 	}
 	
-	FileHandle = CreateFileA(path.AsCString(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, bReadOnly ? OPEN_EXISTING : CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) {
-		FileHandle = nullptr;
+	FileHandle = open(Path.AsCString(), bReadOnly ? O_RDONLY : O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	if (FileHandle == -1) {
+		FileHandle = 0;
 		bCheckedExists = true;
 		bExists = false;
+		return false;
 	}
 	
-	LARGE_INTEGER size;
-	GetFileSizeEx(FileHandle, &size);
-	FileSize = size.QuadPart;
+	struct stat st;
+	fstat(FileHandle, &st);
+	FileSize = st.st_size;
 	FilePos = 0;
 	
 	bOpenRead = bReadOnly;
 	bOpenWrite = !bReadOnly;
 	bCheckedExists = true;
 	bExists = true;
+	return true;
 }
 
 bool File::Open(bool bReadOnly) {
@@ -56,29 +61,30 @@ bool File::Open(bool bReadOnly) {
 		return false;
 	}
 	
-	FileHandle = CreateFileA(path.Data(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) {
-		FileHandle = nullptr;
+	FileHandle = open(Path.AsCString(), bReadOnly ? O_RDONLY : O_WRONLY, S_IRUSR | S_IWUSR);
+	if (FileHandle == -1) {
+		FileHandle = 0;
 		bCheckedExists = true;
 		bExists = false;
 	}
 	
-	LARGE_INTEGER size;
-	GetFileSizeEx(FileHandle, &size);
-	FileSize = size.QuadPart;
+	struct stat st;
+	fstat(FileHandle, &st);
+	FileSize = st.st_size;
 	FilePos = 0;
 	
 	bOpenRead = bReadOnly;
 	bOpenWrite = !bReadOnly;
 	bCheckedExists = true;
 	bExists = true;
+	return true;
 }
 
 void File::Close() {
-	if (FileHandle) {
-		CloseHandle(FileHandle);
+	if (!!FileHandle) {
+		close(FileHandle);
 	}
-	FileHandle = nullptr;
+	FileHandle = 0;
 	bOpenRead = false;
 	bOpenWrite = false;
 }
@@ -88,16 +94,17 @@ bool File::Delete() {
 		Close();
 	}
 	
-	if (DeleteFileA(Path.Data())) {
+	if (unlink(Path.AsCString()) == 0) {
 		return true;
 	}
 	
 	return false;
 }
 
-bool File::Exists() const {
+bool File::Exists() {
 	if (!bCheckedExists) {
-		bExists = GetFileAttributesA(Path.Data()) != INVALID_FILE_ATTRIBUTES;
+		struct stat st;
+		bExists = stat(Path.AsCString(), &st) == 0;
 		bCheckedExists = true;
 	}
 	
@@ -105,7 +112,7 @@ bool File::Exists() const {
 }
 
 bool File::IsOpen() const {
-	return FileHandle != nullptr;
+	return !!FileHandle;
 }
 
 bool File::IsReadable() const {
@@ -121,8 +128,7 @@ uint64 File::Read(uint8* buffer, uint64 size) {
 		return 0;
 	}
 	
-	DWORD bytesRead;
-	ReadFile(FileHandle, buffer, DWORD(size), &bytesRead, nullptr);
+	uint64 bytesRead = read(FileHandle, buffer, size);
 	FilePos += bytesRead;
 	return bytesRead;
 }
@@ -132,9 +138,8 @@ void File::Write(uint8* buffer, uint64 size) {
 		return;
 	}
 	
-	DWORD bytesWritten;
-	WriteFile(FileHandle, buffer, DWORD(size), &bytesWritten, nullptr);
-	FilePos += bytesWritten;
+	write(FileHandle, buffer, size);
+	FilePos += size;
 }
 
 void File::Write(StringView text) {
@@ -142,17 +147,12 @@ void File::Write(StringView text) {
 		return;
 	}
 	
-	DWORD bytesWritten;
-	WriteFile(FileHandle, text.Data(), text.Size(), &bytesWritten, nullptr);
-	FilePos += bytesWritten;
+	write(FileHandle, text.Data(), text.Size());
+	FilePos += text.Size();
 }
 
 void File::Flush() {
-	if (!FileHandle) {
-		return;
-	}
-	
-	FlushFileBuffers(FileHandle);
+	fsync(FileHandle);
 }
 
 #endif

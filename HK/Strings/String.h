@@ -25,8 +25,10 @@ public:
     AnsiString& operator+=(const AnsiString& other);
     AnsiString& operator+=(StringView other);
     AnsiString& operator+=(const char8* other);
+    AnsiString& operator+=(char8 c);
     AnsiString operator+(const AnsiString& other);
     AnsiString operator+(StringView other);
+    AnsiString operator+(const char8* other);
     const char8* operator*();
     const char8* operator*() const;
     bool operator==(const AnsiString& other) const;

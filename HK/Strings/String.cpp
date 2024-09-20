@@ -65,6 +65,12 @@ AnsiString& AnsiString::operator+=(const char8* other) {
 	return *this;
 }
 
+AnsiString& AnsiString::operator+=(char8 c) {
+	RequireArrayMaxGrowth(ArrayNum + 1);
+	Data[ArrayNum++] = c;
+	return *this;
+}
+
 AnsiString AnsiString::operator+(const AnsiString& other) {
 	AnsiString result(ArrayNum + other.ArrayNum);
 	result.Append(AsView());
@@ -76,6 +82,13 @@ AnsiString AnsiString::operator+(StringView view) {
 	AnsiString result(ArrayNum + view.Size());
 	result.Append(AsView());
 	result.Append(view);
+	return Move(result);
+}
+
+AnsiString AnsiString::operator+(const char8* other) {
+	AnsiString result(ArrayNum + StringView(other).Size());
+	result.Append(AsView());
+	result.Append(StringView(other));
 	return Move(result);
 }
 
