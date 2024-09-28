@@ -12,7 +12,11 @@ uint8 GetCurrentBufferIndexAndIncrement() {
 	return result;
 }
 
-Format::__HexUint16 Format::AsHex(uint16 value) {
+Format::__HexUint8 Format::AsHex8(uint8 value) {
+	return *reinterpret_cast<__HexUint8*>(&value);
+}
+
+Format::__HexUint16 Format::AsHex16(uint16 value) {
 	return *reinterpret_cast<__HexUint16*>(&value);
 }
 
@@ -247,19 +251,28 @@ StringView AnsiString::ConvertParam(uint64 v) {
 	return ConvertUnsignedInteger(v);
 }
 
+void ConvertOneHexDigit(uint8 v, char8*& t) {
+	uint8 m = 0b1111;
+	const char8* hex = "0123456789ABCDEF";
+	*t++ = hex[(v >> 4) & m];
+	*t++ = hex[v & m];
+}
+
+StringView AnsiString::ConvertParam(Format::__HexUint8 v) {
+	char8* t = Buffer[CurrentBuffer];
+	*t++ = '0';
+	*t++ = 'x';
+	
+	ConvertOneHexDigit(v.value, t);
+	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], 4);
+}
+
 StringView AnsiString::ConvertParam(Format::__HexUint16 v) {
 	char8* t = Buffer[CurrentBuffer];
 	*t++ = '0';
 	*t++ = 'x';
 	
-	uint16 m = 0b1111;
-	
-	const char8* hex = "0123456789ABCDEF";
-	
-	for (uint32 i = 0; i < 4; ++i) {
-		uint16 cm = m << ((3 - i) * 4);
-		uint16 c = (v.value & cm) >> ((3-i) * 4);
-		*t++ = hex[c];
-	}
+	ConvertOneHexDigit((v.value >> 8) & 0xFF, t);
+	ConvertOneHexDigit(v.value & 0xFF, t);
 	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], 6);
 }
