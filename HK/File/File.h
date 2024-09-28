@@ -5,34 +5,7 @@
 #include "Common/Types.h"
 #include "Strings/String.h"
 #include "Containers/View/StringView.h"
-#include "FilePathBase.h"
-
-class FilePath : public FilePathBase {
-public:
-	FilePath() = default;
-	FilePath(const FilePath& copy) = default;
-	FilePath(FilePath&& move) = default;
-	FilePath(StringView path)
-	{
-		Path = path;
-		Canonicalize();
-	};
-	FilePath(const String& path)
-	{
-		Path = path;
-		Canonicalize();
-	};
-	FilePath(const String&& path)
-	{
-		Path = path;
-		Canonicalize();
-	};
-	FilePath& operator=(const FilePath& other) = default;
-	
-protected:
-	// Implement in platform specific code
-	void Canonicalize();
-};
+#include "FilePath.h"
 
 class File {
 public:

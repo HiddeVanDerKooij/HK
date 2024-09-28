@@ -1,16 +1,13 @@
 #include "Common/CompilerMacros.h"
-#include "File.h"
 
 #if PLATFORM == PLATFORM_LINUX
+
+#include "File.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-void FilePath::Canonicalize() {
-	CanonicalizeForwardSlash();
-}
 
 File::File(const FilePath& path) {
 	

@@ -1,13 +1,10 @@
 #include "Common/CompilerMacros.h"
-#include "File.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
 
-#include <windows.h>
+#include "File.h"
 
-void FilePath::Canonicalize() {
-	CanonicalizeBackwardSlash();
-}
+#include <windows.h>
 
 File::File(const FilePath& path) {
 	

@@ -21,9 +21,11 @@ add_library(HK
 	Containers/BitArray.cpp
 	Containers/BitArray.h
 	File/File.h
-	File/FileLinux.cpp
-	File/FileWindows.cpp
-	File/FilePathBase.cpp
+	File/File_Linux.cpp
+	File/File_Windows.cpp
+	File/FilePath.cpp
+	File/FilePath_Linux.cpp
+	File/FilePath_Windows.cpp
 	Strings/String.h
 	Strings/String.cpp
 	Util/DualType.h
