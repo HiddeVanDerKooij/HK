@@ -36,6 +36,8 @@ public:
 	void GetItems(Array<T>& items) const;
 	
 protected:
+	int32 Find(const T& item) const;
+
 	void Rehash(uint32 newCapacity);
 	void CheckGap(uint32 index);
 	bool FixHole(uint32& index);
@@ -136,22 +138,7 @@ Set<T>& Set<T>::operator=(Set&& other)
 template<typename T>
 bool Set<T>::Contains(const T& item) const
 {
-	const uint32 hash = HasherType::Hash(item);
-	uint32 index = hash % Capacity;
-	const uint32 startIndex = index;
-	do {
-		if (!Entries[index].IsUsed) {
-			return false;
-		}
-		if (Entries[index].Hash == hash && Entries[index].Item == item) {
-			return true;
-		}
-		++index;
-		if (UNLIKELY(index == Capacity)) {
-			index = 0;
-		}
-	} while (index != startIndex);
-	return false;
+	return Find(item) != -1;
 }
 
 template<typename T>
@@ -226,7 +213,8 @@ void Set<T>::Clear()
 template<typename T>
 void Set<T>::GetItems(Array<T>& items) const
 {
-	items.Reset(NumEntries);
+	items.Reset();
+	items.Reserve(NumEntries);
 	
 	SetEntry<T>* entry = Entries;
 	uint32 count = NumEntries;
@@ -238,6 +226,30 @@ void Set<T>::GetItems(Array<T>& items) const
 		items.Add(entry->Item);
 		++entry;
 	}
+}
+
+template<typename T>
+int32 Set<T>::Find(const T& item) const
+{
+	if (UNLIKELY(Entries == nullptr)) {
+		return -1;
+	}
+	const uint32 hash = HasherType::Hash(item);
+	uint32 index = hash % Capacity;
+	const uint32 startIndex = index;
+	do {
+		if (!Entries[index].IsUsed) {
+			return -1;
+		}
+		if (Entries[index].Hash == hash && Entries[index].Item == item) {
+			return index;
+		}
+		++index;
+		if (UNLIKELY(index == Capacity)) {
+			index = 0;
+		}
+	} while (index != startIndex);
+	return -1;
 }
 
 template<typename T>

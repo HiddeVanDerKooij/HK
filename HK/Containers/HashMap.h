@@ -1,12 +1,34 @@
 #pragma once
 
-#include "Common/Types.h"
+#include "Set.h"
 
-template<class Key, class Value>
-class HashMap {
+template<class TKey, class TValue>
+struct HashMapEntry {
+	TKey Key;
+	TValue Value;
+	
+	HashMapEntry() {}
+	HashMapEntry(const TKey& key)
+		: Key(key)
+		, Value(TValue())
+	{}
+	
+	//void Hash(Set<HashMapEntry<TKey, TValue>>::HasherType& hasher) const {
+	void Hash(Hasher<uint32>& hasher) const {
+		Key.Hash(hasher);
+	}
+	
+	bool operator==(const HashMapEntry& other) const {
+		return Key == other.Key;
+	}
+};
+
+template<class TKey, class TValue>
+class HashMap : protected Set<HashMapEntry<TKey, TValue>> {
 public:
+	typedef Set<HashMapEntry<TKey, TValue>> Super;
 	HashMap();
-	HashMap(uint32 capacity);
+	HashMap(uint32 initialSize);
 	HashMap(const HashMap& copy);
 	HashMap(HashMap&& move);
 	~HashMap();
@@ -14,14 +36,133 @@ public:
 	HashMap& operator=(const HashMap& other);
 	HashMap& operator=(HashMap&& other);
 
-	Value& operator[](const Key& key);
-	const Value& operator[](const Key& key) const;
+	TValue& Add(const TKey& key);
+	TValue& FindOrAdd(const TKey& key);
+	TValue* Find(const TKey& key);
+	const TValue* Find(const TKey& key) const;
+	TValue& FindChecked(const TKey& key);
+	const TValue& FindChecked(const TKey& key) const;
 
-	bool Contains(const Key& key) const;
-	bool Remove(const Key& key);
-
-	uint32 Num() const;
-	uint32 Capacity() const;
-
+	void Remove(const TKey& key);
 	void Clear();
+	
+	void GetItems(Array<HashMapEntry<TKey, TValue>>& items) const;
 };
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>::HashMap()
+	: Super()
+{}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>::HashMap(uint32 initialSize)
+	: Super(initialSize)
+{}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>::HashMap(const HashMap& copy)
+	: Super(copy)
+{}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>::HashMap(HashMap&& move)
+	: Super(move)
+{}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>::~HashMap()
+{}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>& HashMap<TKey, TValue>::operator=(const HashMap& other)
+{
+	Super::operator=(other);
+	return *this;
+}
+
+template<class TKey, class TValue>
+HashMap<TKey, TValue>& HashMap<TKey, TValue>::operator=(HashMap&& other)
+{
+	Super::operator=(other);
+	return *this;
+}
+
+template<class TKey, class TValue>
+TValue& HashMap<TKey, TValue>::Add(const TKey& key)
+{
+	HashMapEntry<TKey, TValue> entry;
+	entry.Key = key;
+	entry.Value = TValue();
+	Super::Add(entry);
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	return Super::Entries[index].Item.Value;
+}
+
+template<class TKey, class TValue>
+TValue& HashMap<TKey, TValue>::FindOrAdd(const TKey& key)
+{
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key), &index);
+	if (index != -1) {
+		return Super::Entries[index].Item.Value;
+	}
+	
+	HashMapEntry<TKey, TValue> entry;
+	entry.Key = key;
+	entry.Value = TValue();
+	Super::Add(entry);
+	return Super::Entries[Super::Find(HashMapEntry<TKey, TValue>(key), &index)].Value;
+}
+
+template<class TKey, class TValue>
+TValue* HashMap<TKey, TValue>::Find(const TKey& key)
+{
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	if (index != -1) {
+		return &Super::Entries[index].Item.Value;
+	}
+	return nullptr;
+}
+
+template<class TKey, class TValue>
+const TValue* HashMap<TKey, TValue>::Find(const TKey& key) const
+{
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	if (index != -1) {
+		return &Super::Entries[index].Item.Value;
+	}
+	return nullptr;
+}
+
+template<class TKey, class TValue>
+TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key)
+{
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	CHECK(index != -1);
+	return &Super::Entries[index].Item.Value;
+}
+
+template<class TKey, class TValue>
+const TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key) const
+{
+	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	CHECK(index != -1);
+	return &Super::Entries[index].Item.Value;
+}
+
+template<class TKey, class TValue>
+void HashMap<TKey, TValue>::Remove(const TKey& key)
+{
+	Super::Remove(HashMapEntry<TKey, TValue>(key));
+}
+
+template<class TKey, class TValue>
+void HashMap<TKey, TValue>::Clear()
+{
+	Super::Clear();
+}
+
+template<class TKey, class TValue>
+void HashMap<TKey, TValue>::GetItems(Array<HashMapEntry<TKey, TValue>>& items) const
+{
+	Super::GetItems(items);
+}
