@@ -18,6 +18,7 @@ public:
     AnsiString();
     AnsiString(const AnsiString& copy);
     AnsiString(AnsiString&& move);
+    AnsiString(char8 c);
     AnsiString(uint32 buffer);
     AnsiString(StringView);
 

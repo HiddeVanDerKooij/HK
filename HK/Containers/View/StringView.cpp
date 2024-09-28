@@ -91,6 +91,42 @@ int32 StringView::RightFind(char8 c, uint32 offset) const
 	return -1;
 }
 
+bool StringView::StartsWith(const StringView& other) const
+{
+	if (other.Size() > Size()) return false;
+	for (uint32 i=0; i<other.Size(); ++i) {
+		if (StringData[i] != other.Data()[i]) return false;
+	}
+	return true;
+}
+
+bool StringView::EndsWith(const StringView& other) const
+{
+	if (other.Size() > Size()) return false;
+	for (uint32 i=0; i<other.Size(); ++i) {
+		if (StringData[StringSize - other.Size() + i] != other.Data()[i]) return false;
+	}
+	return true;
+}
+
+char8 StringView::FirstChar() const
+{
+	if (UNLIKELY(StringSize == 0)) return 0;
+	return StringData[0];
+}
+
+char8 StringView::LastChar() const
+{
+	if (UNLIKELY(StringSize == 0)) return 0;
+	return StringData[StringSize - 1];
+}
+
+char8 StringView::At(uint32 index) const
+{
+	if (UNLIKELY(index >= StringSize)) return 0;
+	return StringData[index];
+}
+
 StringView StringView::Substring(uint32 offset, uint32 length) const
 {
 	CHECK(offset <= StringSize);

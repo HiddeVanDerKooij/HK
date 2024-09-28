@@ -31,6 +31,11 @@ AnsiString::AnsiString(const AnsiString& copy) : Array<char8>(copy.ArrayMax) {
 
 AnsiString::AnsiString(AnsiString&& move) : Array<char8>(Move(move)) {}
 
+AnsiString::AnsiString(char8 c) : Array<char8>(1) {
+	Data[0] = c;
+	ArrayNum = 1;
+}
+
 AnsiString::AnsiString(uint32 buffer) : Array<char8>(buffer) {}
 
 AnsiString::AnsiString(StringView view) : Array<char8>(view.Size()) {

@@ -21,8 +21,13 @@ public:
 	const char8* Data() const;
 	uint32 Size() const;
 
-	int32 LeftFind(char8 c, uint32 offset) const;
-	int32 RightFind(char8 c, uint32 offset) const;
+	int32 LeftFind(char8 c, uint32 offset = 0) const;
+	int32 RightFind(char8 c, uint32 offset = 0) const;
+	bool StartsWith(const StringView& other) const;
+	bool EndsWith(const StringView& other) const;
+	char8 FirstChar() const;
+	char8 LastChar() const;
+	char8 At(uint32 index) const;
 	StringView Substring(uint32 offset, uint32 length) const;
 	uint32 CountChar(char8 c) const;
 	
