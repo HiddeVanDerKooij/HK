@@ -1,3 +1,6 @@
+// Copyright (c) 2024, Hidde van der Kooij
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include "Containers/BitArray.h"
 
 #include "Allocators/Memory.h"

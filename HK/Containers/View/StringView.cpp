@@ -1,3 +1,6 @@
+// Copyright (c) 2023-2024, Hidde van der Kooij
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include "Allocators/Memory.h"
 #include "Common/CompilerMacros.h"
 #include "Containers/View/StringView.h"
