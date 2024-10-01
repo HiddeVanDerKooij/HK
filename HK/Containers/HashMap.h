@@ -139,17 +139,17 @@ const TValue* HashMap<TKey, TValue>::Find(const TKey& key) const
 template<class TKey, class TValue>
 TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key)
 {
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
 	CHECK(index != -1);
-	return &Super::Entries[index].Item.Value;
+	return Super::Entries[index].Item.Value;
 }
 
 template<class TKey, class TValue>
 const TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key) const
 {
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
 	CHECK(index != -1);
-	return &Super::Entries[index].Item.Value;
+	return Super::Entries[index].Item.Value;
 }
 
 template<class TKey, class TValue>
