@@ -12,7 +12,7 @@
 File::File(const FilePath& path) {
 	
 	Path = path;
-	FileHandle = nullptr;
+	FileHandlePtr = nullptr;
 	FileSize = 0;
 	FilePos = 0;
 	bOpenRead = false;
@@ -22,10 +22,10 @@ File::File(const FilePath& path) {
 }
 
 File::~File() {
-	if (FileHandle) {
-		CloseHandle(FileHandle);
+	if (FileHandlePtr) {
+		CloseHandle(FileHandlePtr);
 	}
-	FileHandle = nullptr;
+	FileHandlePtr = nullptr;
 }
 
 bool File::Create(bool bReadOnly) {
@@ -33,15 +33,15 @@ bool File::Create(bool bReadOnly) {
 		return false;
 	}
 	
-	FileHandle = CreateFileA(path.AsCString(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, bReadOnly ? OPEN_EXISTING : CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) {
-		FileHandle = nullptr;
+	FileHandlePtr = CreateFileA(Path.AsCString(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, bReadOnly ? OPEN_EXISTING : CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (FileHandlePtr == INVALID_HANDLE_VALUE) {
+		FileHandlePtr = nullptr;
 		bCheckedExists = true;
 		bExists = false;
 	}
 	
 	LARGE_INTEGER size;
-	GetFileSizeEx(FileHandle, &size);
+	GetFileSizeEx(FileHandlePtr, &size);
 	FileSize = size.QuadPart;
 	FilePos = 0;
 	
@@ -49,6 +49,8 @@ bool File::Create(bool bReadOnly) {
 	bOpenWrite = !bReadOnly;
 	bCheckedExists = true;
 	bExists = true;
+	
+	return true;
 }
 
 bool File::Open(bool bReadOnly) {
@@ -56,15 +58,15 @@ bool File::Open(bool bReadOnly) {
 		return false;
 	}
 	
-	FileHandle = CreateFileA(path.Data(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) {
-		FileHandle = nullptr;
+	FileHandlePtr = CreateFileA(Path.AsCString(), bReadOnly ? GENERIC_READ : GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (FileHandlePtr == INVALID_HANDLE_VALUE) {
+		FileHandlePtr = nullptr;
 		bCheckedExists = true;
 		bExists = false;
 	}
 	
 	LARGE_INTEGER size;
-	GetFileSizeEx(FileHandle, &size);
+	GetFileSizeEx(FileHandlePtr, &size);
 	FileSize = size.QuadPart;
 	FilePos = 0;
 	
@@ -72,32 +74,34 @@ bool File::Open(bool bReadOnly) {
 	bOpenWrite = !bReadOnly;
 	bCheckedExists = true;
 	bExists = true;
+	
+	return true;
 }
 
 void File::Close() {
-	if (FileHandle) {
-		CloseHandle(FileHandle);
+	if (FileHandlePtr) {
+		CloseHandle(FileHandlePtr);
 	}
-	FileHandle = nullptr;
+	FileHandlePtr = nullptr;
 	bOpenRead = false;
 	bOpenWrite = false;
 }
 
 bool File::Delete() {
-	if (FileHandle) {
+	if (FileHandlePtr) {
 		Close();
 	}
 	
-	if (DeleteFileA(Path.Data())) {
+	if (DeleteFileA(Path.AsCString())) {
 		return true;
 	}
 	
 	return false;
 }
 
-bool File::Exists() const {
+bool File::Exists() {
 	if (!bCheckedExists) {
-		bExists = GetFileAttributesA(Path.Data()) != INVALID_FILE_ATTRIBUTES;
+		bExists = GetFileAttributesA(Path.AsCString()) != INVALID_FILE_ATTRIBUTES;
 		bCheckedExists = true;
 	}
 	
@@ -105,7 +109,7 @@ bool File::Exists() const {
 }
 
 bool File::IsOpen() const {
-	return FileHandle != nullptr;
+	return FileHandlePtr != nullptr;
 }
 
 bool File::IsReadable() const {
@@ -122,18 +126,18 @@ uint64 File::Read(uint8* buffer, uint64 size) {
 	}
 	
 	DWORD bytesRead;
-	ReadFile(FileHandle, buffer, DWORD(size), &bytesRead, nullptr);
+	ReadFile(FileHandlePtr, buffer, DWORD(size), &bytesRead, nullptr);
 	FilePos += bytesRead;
 	return bytesRead;
 }
 
-void File::Write(uint8* buffer, uint64 size) {
+void File::Write(const uint8* buffer, uint64 size) {
 	if (!FileHandle && bOpenWrite) {
 		return;
 	}
 	
 	DWORD bytesWritten;
-	WriteFile(FileHandle, buffer, DWORD(size), &bytesWritten, nullptr);
+	WriteFile(FileHandlePtr, buffer, DWORD(size), &bytesWritten, nullptr);
 	FilePos += bytesWritten;
 }
 
@@ -143,16 +147,16 @@ void File::Write(StringView text) {
 	}
 	
 	DWORD bytesWritten;
-	WriteFile(FileHandle, text.Data(), text.Size(), &bytesWritten, nullptr);
+	WriteFile(FileHandlePtr, text.Data(), text.Size(), &bytesWritten, nullptr);
 	FilePos += bytesWritten;
 }
 
 void File::Flush() {
-	if (!FileHandle) {
+	if (!FileHandlePtr) {
 		return;
 	}
 	
-	FlushFileBuffers(FileHandle);
+	FlushFileBuffers(FileHandlePtr);
 }
 
 #endif

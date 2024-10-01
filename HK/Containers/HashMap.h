@@ -129,7 +129,7 @@ TValue* HashMap<TKey, TValue>::Find(const TKey& key)
 template<class TKey, class TValue>
 const TValue* HashMap<TKey, TValue>::Find(const TKey& key) const
 {
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key, &index));
+	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
 	if (index != -1) {
 		return &Super::Entries[index].Item.Value;
 	}

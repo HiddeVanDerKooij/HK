@@ -15,7 +15,6 @@ public:
 	File(const File&) = delete;
 	File& operator=(const File&) = delete;
 	
-	// Implement in platform specific code
 	File(const FilePath& path);
 	~File();
 	
@@ -30,7 +29,7 @@ public:
 	bool IsWritable() const;
 	
 	uint64 Read(uint8* buffer, uint64 size);
-	void Write(uint8* buffer, uint64 size);
+	void Write(const uint8* buffer, uint64 size);
 	void Write(StringView text);
 	
 	void Flush();

@@ -6,16 +6,16 @@
 #if PLATFORM == PLATFORM_WINDOWS
 #include "FilePath.h"
 
-char* FilePathStatics::GetPlatformPathSeparator()
+char8 FilePathStatics::GetPlatformPathSeparator()
 {
-	return "\\";
+	return '\\';
 }
 
 bool FilePathStatics::IsAbsolutePlatform(StringView path)
 {
-	if (path.Size() >= 2)
+	if (path.Size() > 2)
 	{
-		if (path[1] == ':')
+		if (path.At(1) == ':')
 		{
 			return true;
 		}
