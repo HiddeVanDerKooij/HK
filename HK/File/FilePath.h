@@ -17,11 +17,16 @@ namespace FilePathStatics {
 	bool IsAbsolute(StringView path);
 	bool IsRelative(StringView path);
 	bool NavigatesUp(StringView path);
+	
+	void FindRootFolder();
+	void FindRootFolder(StringView path);
 }
 
 class FilePath {
 public:	
-	FilePath() = default;
+	static FilePath* RootFolder;
+
+	FilePath();
 	FilePath(const FilePath& copy) = default;
 	FilePath(FilePath&& move) = default;
 	FilePath(StringView path);
@@ -30,7 +35,7 @@ public:
 	FilePath& operator=(const FilePath& other) = default;
 	
 public:
-	const char8* AsCString() const;
+	const char8* AsCString();
 	StringView AsView() const;
 	
 	// Path concludes with a slash
@@ -61,7 +66,6 @@ protected:
 	// with a dot and a slash or two dots and a slash.
 	void Canonicalize();
 
-	
 protected:
 	String Path;
 };

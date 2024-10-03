@@ -180,8 +180,8 @@ void AnsiString::EnsureNullTerminated() {
 }
 
 void AnsiString::CheckNullTerminated() const {
-	if (UNLIKELY(Data == nullptr))
-	ASSERT((ArrayNum < ArrayMax) && (Data[ArrayNum] == '\0'));
+	if (UNLIKELY(Data != nullptr))
+		ASSERT((ArrayNum < ArrayMax) && (Data[ArrayNum] == '\0'));
 }
 
 StringView AnsiString::ConvertParam(const AnsiString& v) {

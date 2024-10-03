@@ -11,6 +11,12 @@ class StringView;
 
 namespace Memory {
 	void* Allocate(uint64 numBytes);
+	
+	template<typename T>
+	T* Allocate(uint64 numElements) {
+		return (T*)Allocate(numElements * sizeof(T));
+	};
+	
 	void Reallocate(void*& ptr, uint64 oldNumBytes, uint64 newNumBytes);
 	void Free(void* ptr, uint64 numBytes);
 	void FillZero(void* Start, uint64 numBytes);

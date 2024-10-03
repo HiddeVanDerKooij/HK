@@ -23,6 +23,7 @@ public:
 	void Close();
 	bool Delete();
 	bool Exists();
+	uint64 GetSize() const;
 	
 	bool IsOpen() const;
 	bool IsReadable() const;
@@ -47,5 +48,3 @@ protected:
 	bool bCheckedExists : 1;
 	bool bExists : 1;
 };
-
-// Implicit cast from StringView to FilePath

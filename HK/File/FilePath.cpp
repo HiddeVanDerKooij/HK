@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
 #include "FilePath.h"
+#include "File.h"
+
+FilePath* FilePath::RootFolder = nullptr;
 
 bool FilePathStatics::IsDirectory(StringView path)
 {
@@ -36,6 +39,40 @@ bool FilePathStatics::NavigatesUp(StringView path)
 	return path.StartsWith(".."_sv) && path.At(2) == GetPlatformPathSeparator();
 }
 
+void FilePathStatics::FindRootFolder()
+{
+	FindRootFolder("./"_sv);
+}
+
+void FilePathStatics::FindRootFolder(StringView path)
+{
+	static FilePath rf = FilePath(path);
+	FilePath::RootFolder = &rf;
+	
+	if (!FilePath::RootFolder->IsDirectory())
+	{
+		*FilePath::RootFolder = FilePath::RootFolder->GetParent();
+	}
+	
+	//*FilePath::RootFolder = FilePath("."_sv);
+	FilePath contender = *FilePath::RootFolder;
+	for (int32 i=0; i<8; ++i)
+	{
+		if (File(contender/"rootfolder"_sv).Exists())
+		{
+			*FilePath::RootFolder = contender;
+			break;
+		}
+		contender = contender.GetParent();
+	}
+}
+
+FilePath::FilePath()
+{
+	Path = "./"_sv;
+	Canonicalize();
+}
+
 FilePath::FilePath(StringView path)
 {
 	Path = path;
@@ -54,7 +91,7 @@ FilePath::FilePath(const String&& path)
 	Canonicalize();
 }
 
-const char8* FilePath::AsCString() const
+const char8* FilePath::AsCString()
 {
 	return Path.AsCString();
 }

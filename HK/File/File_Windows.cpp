@@ -38,6 +38,7 @@ bool File::Create(bool bReadOnly) {
 		FileHandlePtr = nullptr;
 		bCheckedExists = true;
 		bExists = false;
+		return false;
 	}
 	
 	LARGE_INTEGER size;
@@ -63,6 +64,7 @@ bool File::Open(bool bReadOnly) {
 		FileHandlePtr = nullptr;
 		bCheckedExists = true;
 		bExists = false;
+		return false;
 	}
 	
 	LARGE_INTEGER size;
@@ -112,21 +114,13 @@ bool File::IsOpen() const {
 	return FileHandlePtr != nullptr;
 }
 
-bool File::IsReadable() const {
-	return bOpenRead;
-}
-
-bool File::IsWritable() const {
-	return bOpenWrite;
-}
-
 uint64 File::Read(uint8* buffer, uint64 size) {
 	if (!FileHandle && bOpenRead) {
 		return 0;
 	}
 	
 	DWORD bytesRead;
-	ReadFile(FileHandlePtr, buffer, DWORD(size), &bytesRead, nullptr);
+	CHECK(ReadFile(FileHandlePtr, buffer, DWORD(size), &bytesRead, nullptr));
 	FilePos += bytesRead;
 	return bytesRead;
 }

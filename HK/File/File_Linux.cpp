@@ -115,14 +115,6 @@ bool File::IsOpen() const {
 	return !!FileHandle;
 }
 
-bool File::IsReadable() const {
-	return bOpenRead;
-}
-
-bool File::IsWritable() const {
-	return bOpenWrite;
-}
-
 uint64 File::Read(uint8* buffer, uint64 size) {
 	if (!FileHandle && bOpenRead) {
 		return 0;

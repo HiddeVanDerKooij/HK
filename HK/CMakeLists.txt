@@ -20,7 +20,7 @@ add_library(HK
 	Containers/Array.h
 	Containers/BitArray.cpp
 	Containers/BitArray.h
-	File/File.h
+	File/File.cpp
 	File/File_Linux.cpp
 	File/File_Windows.cpp
 	File/FilePath.cpp
@@ -31,6 +31,7 @@ add_library(HK
 	Util/DualType.h
 	Util/DualType.cpp
 	Util/ErrorOr.h
+	Util/Platform_Windows.cpp
 	Util/Out.h
 	Util/Out.cpp)
 
