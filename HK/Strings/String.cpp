@@ -55,9 +55,10 @@ char8 AnsiString::At(uint32 index) const {
 
 AnsiString& AnsiString::operator=(const AnsiString& other) {
 	if (LIKELY(this != &other)) {
-		RequireArrayMaxGrowth(other.ArrayNum);
+		RequireArrayMaxGrowth(other.ArrayNum+1);
 		Memory::Copy(other.Data, Data, ElementSize * (other.ArrayNum));
 		ArrayNum = other.ArrayNum;
+		Data[ArrayNum] = '\0';
 	}
 	return *this;
 }

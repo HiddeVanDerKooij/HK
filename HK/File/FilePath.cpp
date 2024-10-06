@@ -96,6 +96,11 @@ const char8* FilePath::AsCString()
 	return Path.AsCString();
 }
 
+const char8* FilePath::AsCString() const
+{
+	return Path.AsCString();
+}
+
 StringView FilePath::AsView() const
 {
 	return Path.AsView();

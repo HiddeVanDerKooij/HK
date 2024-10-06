@@ -37,6 +37,7 @@ public:
 	
 public:
 	const char8* AsCString();
+	const char8* AsCString() const;
 	StringView AsView() const;
 	
 	// Path concludes with a slash
