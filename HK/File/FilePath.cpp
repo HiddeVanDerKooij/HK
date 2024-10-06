@@ -85,9 +85,9 @@ FilePath::FilePath(const String& path)
 	Canonicalize();
 }
 
-FilePath::FilePath(const String&& path)
+FilePath::FilePath(String&& path)
 {
-	Path = path;
+	Path = Move(path);
 	Canonicalize();
 }
 

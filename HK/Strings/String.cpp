@@ -62,6 +62,19 @@ AnsiString& AnsiString::operator=(const AnsiString& other) {
 	return *this;
 }
 
+AnsiString& AnsiString::operator=(AnsiString&& other) {
+	CHECK(this != &other);
+	Array<char8>::operator=(Move(other));
+	return *this;
+}
+
+AnsiString& AnsiString::operator=(StringView view) {
+	RequireArrayMaxGrowth(view.Size());
+	Memory::Copy(view.Data(), Data, view.Size());
+	ArrayNum = view.Size();
+	return *this;
+}
+
 AnsiString& AnsiString::operator+=(const AnsiString& other) {
 	Append(other.AsView());
 	return *this;

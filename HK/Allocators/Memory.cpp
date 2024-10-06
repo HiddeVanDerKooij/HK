@@ -16,7 +16,7 @@ void* Memory::Allocate(uint64 numBytes)
 {
 	void* data = malloc(numBytes);
 	CHECK(data != nullptr);
-
+	
 #ifdef DEBUG_BUILD
 	memset(data, 0xCD, numBytes);
 #endif
@@ -27,7 +27,8 @@ void* Memory::Allocate(uint64 numBytes)
 void Memory::Reallocate(void*& ptr, uint64 oldNumBytes, uint64 newNumBytes)
 {
 	CHECK(ptr != nullptr);
-	ptr = realloc(ptr, newNumBytes);
+	void* newPtr = realloc(ptr, newNumBytes);
+	ptr = newPtr;
 	CHECK(ptr != nullptr);
 
 #ifdef DEBUG_BUILD

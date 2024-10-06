@@ -28,6 +28,8 @@ public:
     char8 At(uint32 index) const;
 
     AnsiString& operator=(const AnsiString& other);
+    AnsiString& operator=(AnsiString&& other);
+    AnsiString& operator=(StringView view);
     AnsiString& operator+=(const AnsiString& other);
     AnsiString& operator+=(StringView other);
     AnsiString& operator+=(const char8* other);

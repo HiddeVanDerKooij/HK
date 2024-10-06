@@ -33,7 +33,7 @@ class Array {
 public:
 	Array();
 	Array(uint32 buffer);
-	Array(const Array& other);
+	Array(const Array<T>& other);
 	Array(Array&& other);
 	Array(ArrayView<T> other);
 	
@@ -138,7 +138,7 @@ Array<T>::Array(uint32 buffer)
 }
 
 template<typename T>
-Array<T>::Array(const Array& other)
+Array<T>::Array(const Array<T>& other)
 {
 	if (other.ArrayNum > 0) {
 		Data = nullptr;
@@ -458,6 +458,7 @@ void Array<T>::Free()
 {
 	CHECK(Data != nullptr);
 	Memory::Free(Data, ArrayMax * ElementSize);
+	Data = nullptr;
 }
 
 template<typename T>

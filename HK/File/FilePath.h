@@ -31,8 +31,9 @@ public:
 	FilePath(FilePath&& move) = default;
 	FilePath(StringView path);
 	FilePath(const String& path);
-	FilePath(const String&& path);
+	FilePath(String&& path);
 	FilePath& operator=(const FilePath& other) = default;
+	FilePath& operator=(FilePath&& other) = default;
 	
 public:
 	const char8* AsCString();
