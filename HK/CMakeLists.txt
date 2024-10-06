@@ -31,6 +31,7 @@ add_library(HK
 	Util/DualType.h
 	Util/DualType.cpp
 	Util/ErrorOr.h
+	Util/Platform_Linux.cpp
 	Util/Platform_Windows.cpp
 	Util/Out.h
 	Util/Out.cpp)
