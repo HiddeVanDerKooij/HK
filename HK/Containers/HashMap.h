@@ -16,9 +16,8 @@ struct HashMapEntry {
 		, Value(TValue())
 	{}
 	
-	//void Hash(Set<HashMapEntry<TKey, TValue>>::HasherType& hasher) const {
 	void Hash(Hasher<uint32>& hasher) const {
-		Key.Hash(hasher);
+		hasher.HashItem(Key);
 	}
 	
 	bool operator==(const HashMapEntry& other) const {
