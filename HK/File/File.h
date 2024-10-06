@@ -35,6 +35,10 @@ public:
 	
 	void Flush();
 	
+	// Create all directories in the path
+	bool CreateDirectory() const;
+	bool CreateDirectories() const;
+	
 protected:
 	FilePath Path;
 	union {

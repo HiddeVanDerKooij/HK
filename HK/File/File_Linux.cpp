@@ -147,4 +147,12 @@ void File::Flush() {
 	fsync(FileHandle);
 }
 
+bool File::CreateDirectory() const {
+	CHECK(Path.IsDirectory());
+	
+	if (mkdir(Path.AsCString(), S_IRWXU) == 0) {
+		return true;
+	}
+}
+
 #endif
