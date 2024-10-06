@@ -18,6 +18,10 @@ public:
 	template<typename T>
 	static V Hash(const T& item);
 	
+	template<typename T>
+	void HashItem(const T& item);
+	void HashItem(const uint32& item);
+
 protected:
 	uint64 State;
 };
@@ -75,6 +79,19 @@ template<typename T>
 V Hasher<V>::Hash(const T& item)
 {
 	Hasher<V> hasher;
-	item.Hash(hasher);
+	hasher.HashItem(item);
 	return hasher.Get();
+}
+
+template<typename V>
+template<typename T>
+void Hasher<V>::HashItem(const T& item)
+{
+	item.Hash(*this);
+}
+
+template<typename V>
+void Hasher<V>::HashItem(const uint32& item)
+{
+	Add(item);
 }
