@@ -111,6 +111,23 @@ bool File::Exists() {
 	return bExists;
 }
 
+void File::Seek(uint64 pos) {
+	if (!FileHandle) {
+		return;
+	}
+	
+	lseek(FileHandle, pos, SEEK_SET);
+	FilePos = pos;
+}
+
+void File::SeekToEnd() {
+	if (!FileHandle) {
+		return;
+	}
+	
+	FilePos = lseek(FileHandle, 0, SEEK_END);
+}
+
 bool File::IsOpen() const {
 	return !!FileHandle;
 }
@@ -153,6 +170,7 @@ bool File::CreateDirectory() const {
 	if (mkdir(Path.AsCString(), S_IRWXU) == 0) {
 		return true;
 	}
+	return false;
 }
 
 #endif

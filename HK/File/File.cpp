@@ -18,6 +18,12 @@ uint64 File::GetSize() const
 	return FileSize;
 }
 
+uint64 File::GetPos() const
+{
+	CHECK(IsOpen());
+	return FilePos;
+}	
+
 static bool CreateDirectoriesRecursive(FilePath path)
 {
 	if (!path.IsDirectory()) {

@@ -24,6 +24,9 @@ public:
 	bool Delete();
 	bool Exists();
 	uint64 GetSize() const;
+	uint64 GetPos() const;
+	void Seek(uint64 pos);
+	void SeekToEnd();
 	
 	bool IsOpen() const;
 	bool IsReadable() const;

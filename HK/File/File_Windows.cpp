@@ -110,6 +110,28 @@ bool File::Exists() {
 	return bExists;
 }
 
+void File::Seek(uint64 pos) {
+	if (!FileHandlePtr) {
+		return;
+	}
+	
+	LARGE_INTEGER li;
+	li.QuadPart = pos;
+	SetFilePointerEx(FileHandlePtr, li, nullptr, FILE_BEGIN);
+	FilePos = pos;
+}
+
+void File::SeekToEnd() {
+	if (!FileHandlePtr) {
+		return;
+	}
+	
+	LARGE_INTEGER li;
+	li.QuadPart = 0;
+	SetFilePointerEx(FileHandlePtr, li, nullptr, FILE_END);
+	FilePos = GetSize();
+}
+
 bool File::IsOpen() const {
 	return FileHandlePtr != nullptr;
 }
