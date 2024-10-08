@@ -31,7 +31,9 @@ public:
 	char8 FirstChar() const;
 	char8 LastChar() const;
 	char8 At(uint32 index) const;
+	char8 operator[](uint32 index) const;
 	StringView Substring(uint32 offset, uint32 length) const;
+	StringView SubstringSlow(uint32 offset, uint32 length) const;
 	uint32 CountChar(char8 c) const;
 	
 	StringView ChopLeft(uint32 count) const;

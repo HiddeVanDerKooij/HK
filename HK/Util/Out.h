@@ -8,6 +8,20 @@
 
 class Out {
 public:
+	template<class... Types>
+	static void Write(StringView format, Types... args)
+	{
+		String str = String::Format(format, args...);
+		WriteImpl(str.AsView(), false);
+	}
+	
+	template<class... Types>
+	static void WriteLine(StringView format, Types... args)
+	{
+		String str = String::Format(format, args...);
+		WriteImpl(str.AsView(), true);
+	}
+	
 	static void Write(StringView str);
 	static void Write(const String& str);
 	static void WriteLine(StringView str);

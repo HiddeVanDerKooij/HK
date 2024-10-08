@@ -210,6 +210,10 @@ StringView AnsiString::ConvertParam(const char8* v) {
 	return StringView(v);
 }
 
+StringView AnsiString::ConvertParam(bool v) {
+	return v ? "true"_sv : "false"_sv;
+}
+
 static StringView ConvertInteger(uint64 v, char8* b) {
 	char* t = b;
 	*t = '\0';

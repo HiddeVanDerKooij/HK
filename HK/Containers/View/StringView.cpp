@@ -130,12 +130,30 @@ char8 StringView::At(uint32 index) const
 	return StringData[index];
 }
 
+char8 StringView::operator[](uint32 index) const
+{
+	return At(index);
+}
+
 StringView StringView::Substring(uint32 offset, uint32 length) const
 {
 	CHECK(offset <= StringSize);
 	CHECK(offset + length <= StringSize);
 
 	return StringView(&StringData[offset], length);
+}
+
+StringView StringView::SubstringSlow(uint32 offset, uint32 length) const
+{
+	if (offset >= StringSize)
+	{
+		offset = 0;
+	}
+	if (offset + length > StringSize)
+	{
+		length = StringSize - offset;
+	}
+	return Substring(offset, length);
 }
 
 uint32 StringView::CountChar(char8 c) const
