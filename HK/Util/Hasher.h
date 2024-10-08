@@ -21,6 +21,7 @@ public:
 	template<typename T>
 	void HashItem(const T& item);
 	void HashItem(const uint32& item);
+	void HashItem(const uint64& item);
 
 protected:
 	uint64 State;
@@ -92,6 +93,12 @@ void Hasher<V>::HashItem(const T& item)
 
 template<typename V>
 void Hasher<V>::HashItem(const uint32& item)
+{
+	Add(item);
+}
+
+template<typename V>
+void Hasher<V>::HashItem(const uint64& item)
 {
 	Add(item);
 }
