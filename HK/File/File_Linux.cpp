@@ -32,7 +32,7 @@ File::~File() {
 }
 
 bool File::Create(bool bReadOnly) {
-	if (FileHandle) {
+	if (!!FileHandle) {
 		return false;
 	}
 	
@@ -57,7 +57,7 @@ bool File::Create(bool bReadOnly) {
 }
 
 bool File::Open(bool bReadOnly) {
-	if (FileHandle) {
+	if (!!FileHandle) {
 		return false;
 	}
 	
@@ -66,6 +66,7 @@ bool File::Open(bool bReadOnly) {
 		FileHandle = 0;
 		bCheckedExists = true;
 		bExists = false;
+		return false;
 	}
 	
 	struct stat st;
@@ -90,7 +91,7 @@ void File::Close() {
 }
 
 bool File::Delete() {
-	if (FileHandle) {
+	if (!!FileHandle) {
 		Close();
 	}
 	

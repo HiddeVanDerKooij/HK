@@ -23,6 +23,14 @@ Format::__HexUint16 Format::AsHex16(uint16 value) {
 	return *reinterpret_cast<__HexUint16*>(&value);
 }
 
+Format::__HexUint64 Format::AsHex64(uint64 value) {
+	return *reinterpret_cast<__HexUint64*>(&value);
+}
+
+Format::__HexUint64 Format::AsHex64(const void* value) {
+	return *reinterpret_cast<__HexUint64*>(&value);
+}
+
 AnsiString::AnsiString() : Array<char8>() {}
 
 AnsiString::AnsiString(const AnsiString& copy) : Array<char8>(copy.ArrayMax) {
@@ -214,6 +222,10 @@ StringView AnsiString::ConvertParam(bool v) {
 	return v ? "true"_sv : "false"_sv;
 }
 
+StringView AnsiString::ConvertParam(const void* v) {
+	return ConvertParam(Format::AsHex64(v));
+}
+
 static StringView ConvertInteger(uint64 v, char8* b) {
 	char* t = b;
 	*t = '\0';
@@ -301,4 +313,15 @@ StringView AnsiString::ConvertParam(Format::__HexUint16 v) {
 	ConvertOneHexDigit((v.value >> 8) & 0xFF, t);
 	ConvertOneHexDigit(v.value & 0xFF, t);
 	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], 6);
+}
+
+StringView AnsiString::ConvertParam(Format::__HexUint64 v) {
+	char8* t = Buffer[CurrentBuffer];
+	*t++ = '0';
+	*t++ = 'x';
+	
+	for (uint32 i = 0; i < 8; ++i) {
+		ConvertOneHexDigit((v.value >> (56 - i * 8)) & 0xFF, t);
+	}
+	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], 18);
 }

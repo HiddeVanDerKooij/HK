@@ -20,6 +20,8 @@ namespace FilePathStatics {
 	
 	void FindRootFolder();
 	void FindRootFolder(StringView path);
+	
+	Array<StringView> GetComponents(StringView path);
 }
 
 class FilePath {

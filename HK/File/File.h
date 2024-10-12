@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
-#pragma
+#pragma once
 
 // A hopefully straightfoward disk-backed file
 
@@ -42,10 +42,12 @@ public:
 	bool CreateDirectory() const;
 	bool CreateDirectories() const;
 	
+	void PrintState() const;
+	
 protected:
 	FilePath Path;
 	union {
-		void* FileHandlePtr;
+		void* FileHandlePtr = nullptr;
 		int32 FileHandle;
 	};
 	uint64 FileSize;

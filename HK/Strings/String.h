@@ -14,6 +14,9 @@ namespace Format {
     __HexUint8 AsHex8(uint8 value);
     struct __HexUint16 { uint16 value; };
     __HexUint16 AsHex16(uint16 value);
+    struct __HexUint64 { uint64 value; };
+    __HexUint64 AsHex64(uint64 value);
+    __HexUint64 AsHex64(const void* value);
 };
 
 class AnsiString : protected Array<char8> {
@@ -109,9 +112,11 @@ protected:
     static StringView ConvertParam(f32 v);
     static StringView ConvertParam(f64 v);
     static StringView ConvertParam(bool v);
+    static StringView ConvertParam(const void* v);
     
     static StringView ConvertParam(Format::__HexUint8 v);
     static StringView ConvertParam(Format::__HexUint16 v);
+    static StringView ConvertParam(Format::__HexUint64 v);
 };
 
 typedef AnsiString String;

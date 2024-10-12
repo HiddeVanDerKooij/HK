@@ -67,6 +67,31 @@ void FilePathStatics::FindRootFolder(StringView path)
 	}
 }
 
+Array<StringView> FilePathStatics::GetComponents(StringView path)
+{
+	Array<StringView> components(16);
+	uint32 currentPos = 0;
+	char8 pathSeparator = GetPlatformPathSeparator();
+	
+	while (true)
+	{
+		int32 separator = path.LeftFind(pathSeparator, currentPos);
+		if (separator == -1)
+		{
+			components.Add(path.Substring(currentPos, path.Size() - currentPos));
+			break;
+		}
+		else
+		{
+			components.Add(path.Substring(currentPos, separator-currentPos));
+			currentPos = separator+1;
+			if (currentPos >= path.Size())
+				break;
+		}
+	}
+	return components;
+}
+
 FilePath::FilePath()
 {
 	Path = "./"_sv;
@@ -135,19 +160,15 @@ FilePath FilePath::GetParent() const
 {
 	if (IsDirectory())
 	{
-		StringView path = Path.AsView().ChopRight(1);
-		int32 lastSlash = path.RightFind(FilePathStatics::GetPlatformPathSeparator());
-		if (lastSlash == -1)
-		{
-			String up = ".."_sv;
-			up += FilePathStatics::GetPlatformPathSeparator();
-			return FilePath(up);
-		}
-		if (NavigatesUp())
-		{
-			
-		}
-		return FilePath(path.Substring(0, lastSlash + 1));
+		int32 lastSlash = Path.AsView().RightFind(FilePathStatics::GetPlatformPathSeparator());
+		
+		CHECK(lastSlash != -1);
+		String up = Path.AsView();
+		up += ".."_sv;
+		up += FilePathStatics::GetPlatformPathSeparator();
+		FilePath fUp(up);
+		fUp.Canonicalize();
+		return fUp;
 	}
 	else
 	{
@@ -161,12 +182,12 @@ StringView FilePath::GetFilename() const
 	
 	StringView path = Path.AsView();
 	
-	uint32 lastSlash = path.RightFind(FilePathStatics::GetPlatformPathSeparator());
+	int32 lastSlash = path.RightFind(FilePathStatics::GetPlatformPathSeparator());
 	if (lastSlash == -1)
 	{
 		return path;
 	}
-	return path.Substring(lastSlash + 1, path.Size() - lastSlash - 1);
+	return path.Substring(uint32(lastSlash) + 1, path.Size() - uint32(lastSlash) - 1);
 }
 
 StringView FilePath::GetExtension() const
@@ -220,6 +241,7 @@ FilePath FilePath::operator/(FilePath other) const
 
 void FilePath::Canonicalize()
 {
+	// Use proper path separators everywhere
 	String newPath = String(Path.Size()+2);
 	const char8 targetSeparator = FilePathStatics::GetPlatformPathSeparator();
 	const char8 sourceSeparator = (targetSeparator == '/') ? '\\' : '/';
@@ -233,13 +255,51 @@ void FilePath::Canonicalize()
 	}
 	
 	// Now we need to ensure it's absolute, or relative
+	/*
 	bool bAbsolute = FilePathStatics::IsAbsolute(newPath.AsView());
 	if (!bAbsolute) {
 		if (!FilePathStatics::NavigatesUp(newPath.AsView())) {
 			newPath = String("."_sv) + targetSeparator + newPath;
 		}
 	}
+	*/
 	
-	newPath.AsCString();
-	Path = Move(newPath);
+	// If we have any parent directory traversals we clean them up
+	// Also we clean up any current directory reference except
+	// the first one.
+	bool isFile = FilePathStatics::IsFile(newPath.AsView());
+	Array<StringView> components = FilePathStatics::GetComponents(newPath.AsView());
+	
+	for (uint32 i=components.Num()-1; i>0; --i)
+	{
+		StringView current = components[i];
+		if (current == "..")
+		{
+			StringView prev = components[i-1];
+			if (prev != "..")
+			{
+				components.RemoveAt(i);
+				components.RemoveAt(i-1);
+				--i;
+				// TODO (HvdK): RemoveAtN(i-1, 2)
+			}
+		}
+		else if (current == ".")
+		{
+			components.RemoveAt(i);
+		}
+	}
+	
+	String cleanedPath(newPath.Size());
+	
+	for (uint32 i=0; i<components.Num(); ++i)
+	{
+		auto& component = components[i];
+		cleanedPath += component;
+		if (!isFile || (i+1) < components.Num())
+			cleanedPath += targetSeparator;
+	}
+	
+	cleanedPath.AsCString();
+	Path = Move(cleanedPath);
 }

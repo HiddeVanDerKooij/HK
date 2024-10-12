@@ -3,13 +3,16 @@
 
 #pragma once
 
-#define AssertIfFailed(success) {if (!(success)) { BREAK; }}
+void AssertFailed(const char* file, int line, const char* code);
+#define AssertIfFailed(success, file, line, code) {if (!(success)) { AssertFailed(file, line, code); BREAK; }}
 
 // Normalizing definitions passed into the build system
 
 #define PLATFORM_WINDOWS 0
 #define PLATFORM_LINUX 1
 #define PLATFORM_UNKNOWN 2
+
+
 
 #define BUILD_TYPE_DEBUG 0
 #define BUILD_TYPE_RELEASE 1
@@ -31,17 +34,20 @@
 #define MSVC
 #define COMPILER_VENDOR "MSVC"
 #define PLATFORM PLATFORM_WINDOWS
+#define PLATFORM_STRING "Windows"
 #endif
 
 #ifdef __GNUC__
 #define GCC
 #define COMPILER_VENDOR "GCC"
 #define PLATFORM PLATFORM_LINUX
+#define PLATFORM_STRING "Linux"
 #endif
 
 #ifndef BUILD_TYPE
 #define BUILD_TYPE BUILD_TYPE_UNKNOWN
 #define BUILD_TYPE_STR "UNKNOWN"
+#define PLATFORM_STRING "Unknown"
 #endif
 
 // Compiler specific macros
@@ -117,7 +123,7 @@
 #define __DBG_INCREMENT_IMPL(x) {}
 #endif
 #ifndef __ASSERT_IMPL
-#define __ASSERT_IMPL(x) AssertIfFailed(LIKELY(x))
+#define __ASSERT_IMPL(x) AssertIfFailed(LIKELY(x), __FILE__, __LINE__, #x)
 #endif
 
 #ifndef BUILD_TYPE
@@ -145,7 +151,7 @@
 #define CHECK(x)				ASSERT(x)
 #define STATIC_CHECK(x)			static_assert(x, #x)
 #define __BS                    CONCATENATE(COMPILER_VENDOR, "_")
-#define BUILD_STRING			(BUILD_TYPE_STR "_" COMPILER_VENDOR)
+#define BUILD_STRING			(BUILD_TYPE_STR "_" COMPILER_VENDOR "_" PLATFORM_STRING)
 #define STR(x)					#x
 #define XSTR(x)					STR(x)
 #define CONCATENATE(x, y)		x##y

@@ -26,7 +26,7 @@ BitArray::~BitArray() {
 
 void BitArray::AddBit(bool bit) {
 	if (UNLIKELY(BitNum / 8 >= ArrayNum))
-		uint8* discard = AddUninitialized(1);
+		(void)AddUninitialized(1);
 	
 	uint32 byteIndex = BitNum / 8;
 	uint32 bitIndex = BitNum % 8;

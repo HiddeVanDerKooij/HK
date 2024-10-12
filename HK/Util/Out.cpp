@@ -21,6 +21,10 @@ void Out::WriteLine(const String& str) {
 	WriteImpl(str.AsView(), true);
 }
 
+void Out::WriteEnvironment() {
+	WriteLine("HK: {}"_sv, BUILD_STRING);
+}
+
 void Out::WriteImpl(StringView str, bool bNewLine) {
 
 	String output = String();

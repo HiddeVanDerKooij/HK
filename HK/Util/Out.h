@@ -26,6 +26,8 @@ public:
 	static void Write(const String& str);
 	static void WriteLine(StringView str);
 	static void WriteLine(const String& str);
+	
+	static void WriteEnvironment();
 
 
 private:
