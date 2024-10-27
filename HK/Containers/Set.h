@@ -33,13 +33,21 @@ public:
 
 	bool Contains(const T& item) const;
 	bool Add(const T& item);
+	uint32 AddGetIndex(const T& item);
 	bool Remove(const T& item);
 	void Clear();
+	
+	T* Find(const T& item);
+	const T* Find(const T& item) const;
+	T& FindOrAdd(const T& item);
 	
 	void GetItems(Array<T>& items) const;
 	
 protected:
-	int32 Find(const T& item) const;
+	int32 FindIndex(const T& item) const;
+	
+private:
+	bool AddImpl(const T& item, uint32* outIndex);
 
 	void Rehash(uint32 newCapacity);
 	void CheckGap(uint32 index);
@@ -141,35 +149,21 @@ Set<T>& Set<T>::operator=(Set&& other)
 template<typename T>
 bool Set<T>::Contains(const T& item) const
 {
-	return Find(item) != -1;
+	return !!Find(item);
 }
 
 template<typename T>
 bool Set<T>::Add(const T& item)
 {
-	if (UNLIKELY(NumEntries >= SetMaxLoadFactor * Capacity)) {
-		Rehash(Capacity * 2);
-	}
-	const uint32 hash = HasherType::Hash(item);
-	uint32 index = hash % Capacity;
-	const uint32 startIndex = index;
-	do {
-		if (!Entries[index].IsUsed) {
-			Entries[index].Item = item;
-			Entries[index].Hash = hash;
-			Entries[index].IsUsed = true;
-			++NumEntries;
-			return true;
-		}
-		if (Entries[index].Hash == hash && Entries[index].Item == item) {
-			return false;
-		}
-		++index;
-		if (UNLIKELY(index == Capacity)) {
-			index = 0;
-		}
-	} while (index != startIndex);
-	return false;
+	return AddImpl(item, nullptr);
+}
+
+template<typename T>
+uint32 Set<T>::AddGetIndex(const T& item)
+{
+	uint32 index = 0;
+	AddImpl(item, &index);
+	return index;
 }
 
 template<typename T>
@@ -213,6 +207,38 @@ void Set<T>::Clear()
 	NumEntries = 0;
 }
 
+
+template<typename T>
+T* Set<T>::Find(const T& item)
+{
+	const int32 index = FindIndex(item);
+	if (index >= 0) {
+		return &Entries[index].Item;
+	}
+	return nullptr;
+}
+
+template<typename T>
+const T* Set<T>::Find(const T& item) const
+{
+	const int32 index = FindIndex(item);
+	if (index >= 0) {
+		return &Entries[index].Item;
+	}
+	return nullptr;
+}
+
+template<typename T>
+T& Set<T>::FindOrAdd(const T& item)
+{
+	T* found = Find(item);
+	if (!!found) {
+		return *found;
+	}
+	return Entries[AddGetIndex(item)].Item;
+}
+
+
 template<typename T>
 void Set<T>::GetItems(Array<T>& items) const
 {
@@ -232,7 +258,7 @@ void Set<T>::GetItems(Array<T>& items) const
 }
 
 template<typename T>
-int32 Set<T>::Find(const T& item) const
+int32 Set<T>::FindIndex(const T& item) const
 {
 	if (UNLIKELY(Entries == nullptr)) {
 		return -1;
@@ -253,6 +279,43 @@ int32 Set<T>::Find(const T& item) const
 		}
 	} while (index != startIndex);
 	return -1;
+}
+
+template<typename T>
+bool Set<T>::AddImpl(const T& item, uint32* outIndex)
+{
+	if (UNLIKELY(NumEntries >= SetMaxLoadFactor * Capacity)) {
+		Rehash(Capacity * 2);
+	}
+	const uint32 hash = HasherType::Hash(item);
+	uint32 index = hash % Capacity;
+	const uint32 startIndex = index;
+	do {
+		if (!Entries[index].IsUsed) {
+			Entries[index].Item = item;
+			Entries[index].Hash = hash;
+			Entries[index].IsUsed = true;
+			++NumEntries;
+			if (outIndex)
+			{
+				*outIndex = index;
+			}
+			return true;
+		}
+		if (Entries[index].Hash == hash && Entries[index].Item == item) {
+			if (outIndex)
+			{
+				*outIndex = index;
+			}
+			return false;
+		}
+		++index;
+		if (UNLIKELY(index == Capacity)) {
+			index = 0;
+		}
+	} while (index != startIndex);
+	CHECK(false);
+	return false;
 }
 
 template<typename T>

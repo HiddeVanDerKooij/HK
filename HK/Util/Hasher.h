@@ -20,6 +20,8 @@ public:
 	
 	template<typename T>
 	void HashItem(const T& item);
+	void HashItem(const uint8& item);
+	void HashItem(const uint16& item);
 	void HashItem(const uint32& item);
 	void HashItem(const uint64& item);
 
@@ -89,6 +91,18 @@ template<typename T>
 void Hasher<V>::HashItem(const T& item)
 {
 	item.Hash(*this);
+}
+
+template<typename V>
+void Hasher<V>::HashItem(const uint8& item)
+{
+	Add(item);
+}
+
+template<typename V>
+void Hasher<V>::HashItem(const uint16& item)
+{
+	Add(item);
 }
 
 template<typename V>

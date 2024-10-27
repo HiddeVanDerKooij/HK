@@ -96,14 +96,14 @@ TValue& HashMap<TKey, TValue>::Add(const TKey& key)
 	entry.Key = key;
 	entry.Value = TValue();
 	Super::Add(entry);
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	uint32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	return Super::Entries[index].Item.Value;
 }
 
 template<class TKey, class TValue>
 TValue& HashMap<TKey, TValue>::FindOrAdd(const TKey& key)
 {
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key), &index);
+	int32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	if (index != -1) {
 		return Super::Entries[index].Item.Value;
 	}
@@ -112,13 +112,13 @@ TValue& HashMap<TKey, TValue>::FindOrAdd(const TKey& key)
 	entry.Key = key;
 	entry.Value = TValue();
 	Super::Add(entry);
-	return Super::Entries[Super::Find(HashMapEntry<TKey, TValue>(key), &index)].Value;
+	return Super::Entries[Super::FindIndex(HashMapEntry<TKey, TValue>(key))].Item.Value;
 }
 
 template<class TKey, class TValue>
 TValue* HashMap<TKey, TValue>::Find(const TKey& key)
 {
-	uint32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	int32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	if (index != -1) {
 		return &Super::Entries[index].Item.Value;
 	}
@@ -128,7 +128,7 @@ TValue* HashMap<TKey, TValue>::Find(const TKey& key)
 template<class TKey, class TValue>
 const TValue* HashMap<TKey, TValue>::Find(const TKey& key) const
 {
-	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	int32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	if (index != -1) {
 		return &Super::Entries[index].Item.Value;
 	}
@@ -138,7 +138,7 @@ const TValue* HashMap<TKey, TValue>::Find(const TKey& key) const
 template<class TKey, class TValue>
 TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key)
 {
-	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	int32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	CHECK(index != -1);
 	return Super::Entries[index].Item.Value;
 }
@@ -146,7 +146,7 @@ TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key)
 template<class TKey, class TValue>
 const TValue& HashMap<TKey, TValue>::FindChecked(const TKey& key) const
 {
-	int32 index = Super::Find(HashMapEntry<TKey, TValue>(key));
+	int32 index = Super::FindIndex(HashMapEntry<TKey, TValue>(key));
 	CHECK(index != -1);
 	return Super::Entries[index].Item.Value;
 }

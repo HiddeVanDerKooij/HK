@@ -18,9 +18,7 @@ add_library(HK
 	Containers/View/StringView.cpp
 	Containers/View/StringView.h
 	Containers/Array.cpp
-	Containers/Array.h
 	Containers/BitArray.cpp
-	Containers/BitArray.h
 	File/File.cpp
 	File/File_Linux.cpp
 	File/File_Windows.cpp
