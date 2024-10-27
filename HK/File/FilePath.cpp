@@ -4,6 +4,9 @@
 #include "FilePath.h"
 #include "File.h"
 
+#include "Util/Out.h"
+#include "Bench/Bench.h"
+
 FilePath* FilePath::RootFolder = nullptr;
 
 bool FilePathStatics::IsDirectory(StringView path)
@@ -46,6 +49,8 @@ void FilePathStatics::FindRootFolder()
 
 void FilePathStatics::FindRootFolder(StringView path)
 {
+	ScopeBenchmark bench("FindRootFolder"_sv);
+	
 	static FilePath rf = FilePath(path);
 	FilePath::RootFolder = &rf;
 	
@@ -167,7 +172,6 @@ FilePath FilePath::GetParent() const
 		up += ".."_sv;
 		up += FilePathStatics::GetPlatformPathSeparator();
 		FilePath fUp(up);
-		fUp.Canonicalize();
 		return fUp;
 	}
 	else
@@ -239,8 +243,22 @@ FilePath FilePath::operator/(FilePath other) const
 	return FilePath(Move(path));
 }
 
+FilePath FilePath::operator+(StringView other) const
+{
+	return operator+(FilePath(other));
+}
+
+FilePath FilePath::operator+(FilePath other) const
+{
+	String path = Path;
+	path += other.Path;
+	return FilePath(Move(path));
+}
+
 void FilePath::Canonicalize()
 {
+	ScopeBenchmark bench("Canonicalize"_sv);
+	
 	// Use proper path separators everywhere
 	String newPath = String(Path.Size()+2);
 	const char8 targetSeparator = FilePathStatics::GetPlatformPathSeparator();
@@ -273,10 +291,10 @@ void FilePath::Canonicalize()
 	for (uint32 i=components.Num()-1; i>0; --i)
 	{
 		StringView current = components[i];
-		if (current == "..")
+		if (current == ".."_sv)
 		{
 			StringView prev = components[i-1];
-			if (prev != "..")
+			if (prev != ".."_sv && prev != "."_sv)
 			{
 				components.RemoveAt(i);
 				components.RemoveAt(i-1);
@@ -284,7 +302,7 @@ void FilePath::Canonicalize()
 				// TODO (HvdK): RemoveAtN(i-1, 2)
 			}
 		}
-		else if (current == ".")
+		else if (current == "."_sv)
 		{
 			components.RemoveAt(i);
 		}

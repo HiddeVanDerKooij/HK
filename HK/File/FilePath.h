@@ -63,6 +63,8 @@ public:
 	
 	FilePath operator/(StringView other) const;
 	FilePath operator/(FilePath other) const;
+	FilePath operator+(StringView other) const;
+	FilePath operator+(FilePath other) const;
 protected:
 	// Turn a path into a canonical form, ensuring
 	// correct path separators, absolute paths start

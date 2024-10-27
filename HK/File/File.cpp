@@ -1,6 +1,7 @@
 #include "File.h"
 
 #include "Common/CompilerMacros.h"
+#include "Util/Out.h"
 
 bool File::IsReadable() const
 {
@@ -43,4 +44,15 @@ static bool CreateDirectoriesRecursive(FilePath path)
 bool File::CreateDirectories() const
 {
 	return CreateDirectoriesRecursive(Path);
+}
+
+void File::PrintState() const
+{
+	Out::WriteLine("File: {}"_sv, Path.AsView());
+	Out::WriteLine("Size: {}"_sv, FileSize);
+	Out::WriteLine("Pos: {}"_sv, FilePos);
+	Out::WriteLine("OpenRead: {}"_sv, bOpenRead);
+	Out::WriteLine("OpenWrite: {}"_sv, bOpenWrite);
+	Out::WriteLine("Exists: {}"_sv, bExists);
+	Out::WriteLine("FileHandle: {}, {}"_sv, FileHandle, FileHandlePtr);
 }

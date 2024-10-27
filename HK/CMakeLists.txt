@@ -4,6 +4,7 @@ add_library(HK
 	Allocators/Pool.h
 	Allocators/StringPool.cpp
 	Allocators/StringPool.h
+	Bench/Bench.cpp
     Common/CompilerMacros.cpp
     Common/CompilerMacros.h
     Common/Math.cpp

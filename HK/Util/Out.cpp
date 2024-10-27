@@ -30,10 +30,10 @@ void Out::WriteImpl(StringView str, bool bNewLine) {
 	String output = String();
 
 	if (bNewLine) {
-		output = String::Format("{}\n", str);
+		output = String::Format("{}\n"_sv, str);
 	}
 	else {
-		output = String::Format("{}", str);
+		output = String::Format("{}"_sv, str);
 	}
 	std::cout << *output;
 }
