@@ -10,6 +10,7 @@
 #include "Common/CompilerMacros.h"
 #include "Common/Types.h"
 #include "Containers/View/ArrayView.h"
+#include "Algo/Sort.h"
 
 // TODO (HvdK): Reduce code generation by having a templated
 // array implementation that only worries about sizeof(T),
@@ -383,16 +384,7 @@ const T* Array<T>::GetData() const
 template<typename T>
 void Array<T>::Sort(int32(*compare)(const typename RemoveReference<T>::Type& a, const typename RemoveReference<T>::Type& b))
 {
-	// TODO (HvdK): Use a more efficient sorting algorithm
-	for (uint32 i = 0; i < ArrayNum; ++i) {
-		for (uint32 j = ArrayNum - 1; j > i; --j) {
-			if (compare(Data[j], Data[i]) < 0) {
-				T tmp = Move(Data[i]);
-				Data[i] = Move(Data[j]);
-				Data[j] = Move(tmp);
-			}
-		}
-	}
+	return Algo::Sort(Data, ArrayNum, compare);
 }
 
 template<typename T>

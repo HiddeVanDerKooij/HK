@@ -11,7 +11,7 @@ public:
 	StringView();
 	StringView(ENoInit);
 	StringView(const StringView& other) = default;
-	StringView(const char8* string);
+	explicit StringView(const char8* string);
 	StringView(const char8* string, uint32 size);
 
 	StringView& operator=(const StringView& other) = default;

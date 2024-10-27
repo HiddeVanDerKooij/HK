@@ -151,6 +151,13 @@ bool AnsiString::operator!=(const StringView& other) const
 	return AsView() != other;
 }
 
+void AnsiString::RemoveLast(uint32 n)
+{
+	ASSERT(n <= ArrayNum);
+	ArrayNum -= n;
+	Data[ArrayNum] = '\0';
+}
+
 uint32 AnsiString::Size() const {
 	return ArrayNum;
 }
@@ -287,6 +294,51 @@ StringView AnsiString::ConvertParam(int64 v) {
 
 StringView AnsiString::ConvertParam(uint64 v) {
 	return ConvertUnsignedInteger(v);
+}
+
+StringView AnsiString::ConvertParam(f32 v)
+{
+	return ConvertParam(f64(v));
+}
+
+StringView AnsiString::ConvertParam(f64 v)
+{
+	char8* t = Buffer[CurrentBuffer];
+	const char8* start = t;
+	if (v < 0.)
+	{
+		*t++ = '-';
+		v = -v;
+	}
+	uint64 n = uint64(v);
+	
+	{
+		char8* s = t;
+		do {
+			*++t = '0' + (n % 10);
+			n /= 10;
+		} while (n != 0);
+
+		char8* end = t;
+
+		while (s < t) {
+			char8 c = *s;
+			*s++ = *t;
+			*t-- = c;
+		}
+		t = end;
+	}
+	*t++ = '.';
+	
+	v -= uint64(v);
+	for (uint32 i=0; i<4; ++i)
+	{
+		v *= 10.;
+		uint32 d = uint32(v);
+		v -= d;
+		*t++ = '0'+d;
+	}
+	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], t - start);
 }
 
 void ConvertOneHexDigit(uint8 v, char8*& t) {

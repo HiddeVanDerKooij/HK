@@ -47,6 +47,8 @@ public:
     bool operator==(const StringView& other) const;
     bool operator!=(const StringView& other) const;
     
+    void RemoveLast(uint32 n);
+    
     uint32 Size() const;
 
     void Append(StringView view);
@@ -109,10 +111,10 @@ protected:
     static StringView ConvertParam(uint32 v);
     static StringView ConvertParam(int64 v);
     static StringView ConvertParam(uint64 v);
-    static StringView ConvertParam(f32 v);
-    static StringView ConvertParam(f64 v);
     static StringView ConvertParam(bool v);
     static StringView ConvertParam(const void* v);
+    static StringView ConvertParam(f32 v);
+    static StringView ConvertParam(f64 v);
     
     static StringView ConvertParam(Format::__HexUint8 v);
     static StringView ConvertParam(Format::__HexUint16 v);
