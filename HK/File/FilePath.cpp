@@ -265,6 +265,7 @@ void FilePath::Canonicalize()
 	const char8 sourceSeparator = (targetSeparator == '/') ? '\\' : '/';
 	
 	for (uint32 i=0; i<Path.Size(); ++i) {
+		ScopeBenchmark bench("Separator"_sv);
 		char8 c = Path.At(i);
 		if (c == sourceSeparator) {
 			c = targetSeparator;
@@ -286,11 +287,19 @@ void FilePath::Canonicalize()
 	// Also we clean up any current directory reference except
 	// the first one.
 	bool isFile = FilePathStatics::IsFile(newPath.AsView());
-	Array<StringView> components = FilePathStatics::GetComponents(newPath.AsView());
-	
-	for (uint32 i=components.Num()-1; i>0; --i)
+	Array<StringView> components;
+	if (FilePathStatics::IsRelative(newPath.AsView()))
 	{
+		components.Add("."_sv);
+	}
+	components.AddRange(ArrayView<StringView>(FilePathStatics::GetComponents(newPath.AsView())));
+	
+	for (uint32 i=components.Num()-1; i>0 && i < components.Num(); --i)
+	{
+		ScopeBenchmark bench("Component iteration"_sv);
+		
 		StringView current = components[i];
+		
 		if (current == ".."_sv)
 		{
 			StringView prev = components[i-1];

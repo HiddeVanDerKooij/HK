@@ -11,6 +11,7 @@
 #include "Common/Types.h"
 #include "Containers/View/ArrayView.h"
 #include "Algo/Sort.h"
+#include "Bench/Bench.h"
 
 // TODO (HvdK): Reduce code generation by having a templated
 // array implementation that only worries about sizeof(T),
@@ -253,8 +254,18 @@ template<typename T>
 }
 
 template<typename T>
+void Array<T>::AddRange(const ArrayView<T>& items)
+{
+	RequireArrayMaxGrowth(ArrayNum + items.Size());
+	for (uint32 i = 0; i < items.Size(); ++i) {
+		Add(items[i]);
+	}
+}
+
+template<typename T>
 void Array<T>::RemoveAt(uint32 index)
 {
+	ScopeBenchmark bench("RemoveAt"_sv);
 	CHECK(IsValidIndex(index));
 	
 	DestroyAt(index);
@@ -270,6 +281,7 @@ void Array<T>::RemoveAt(uint32 index)
 template<typename T>
 void Array<T>::RemoveAtSwap(uint32 index)
 {
+	ScopeBenchmark bench("RemoveAtSwap"_sv);
 	CHECK(IsValidIndex(index));
 
 	DestroyAt(index);

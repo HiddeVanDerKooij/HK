@@ -346,7 +346,8 @@ StringView AnsiString::ConvertParam(f64 v)
 		v -= d;
 		*t++ = '0'+d;
 	}
-	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], t - start);
+	ASSERT(t >= start);
+	return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], uint32(t - start));
 }
 
 void ConvertOneHexDigit(uint8 v, char8*& t) {
