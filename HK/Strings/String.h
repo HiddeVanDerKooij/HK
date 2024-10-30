@@ -14,6 +14,10 @@ namespace Format {
     __HexUint8 AsHex8(uint8 value);
     struct __HexUint16 { uint16 value; };
     __HexUint16 AsHex16(uint16 value);
+    struct __HexUint24 { uint32 value; };
+    __HexUint24 AsHex24(uint32 value);
+    struct __HexUint32 { uint32 value; };
+    __HexUint32 AsHex32(uint32 value);
     struct __HexUint64 { uint64 value; };
     __HexUint64 AsHex64(uint64 value);
     __HexUint64 AsHex64(const void* value);
@@ -118,6 +122,8 @@ protected:
     
     static StringView ConvertParam(Format::__HexUint8 v);
     static StringView ConvertParam(Format::__HexUint16 v);
+    static StringView ConvertParam(Format::__HexUint24 v);
+    static StringView ConvertParam(Format::__HexUint32 v);
     static StringView ConvertParam(Format::__HexUint64 v);
 };
 
