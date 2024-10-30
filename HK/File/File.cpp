@@ -38,7 +38,7 @@ static bool CreateDirectoriesRecursive(FilePath path)
 		return false;
 	}
 	
-	return File(path).CreateDirectory();
+	return File(path).CreateDir();
 }
 
 bool File::CreateDirectories() const

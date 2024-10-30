@@ -175,4 +175,10 @@ void File::Flush() {
 	FlushFileBuffers(FileHandlePtr);
 }
 
+bool File::CreateDir() const {
+	CHECK(Path.IsDirectory());
+	
+	return CreateDirectoryA(Path.AsCString(), nullptr);
+}
+
 #endif

@@ -39,7 +39,7 @@ public:
 	void Flush();
 	
 	// Create all directories in the path
-	bool CreateDirectory() const;
+	bool CreateDir() const;
 	bool CreateDirectories() const;
 	
 	void PrintState() const;
