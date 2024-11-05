@@ -138,11 +138,11 @@ void AssertFailed(const char* file, int line, const char* code);
 #ifdef DEBUG_BUILD
 
 #undef __ASSUME_IMPL
-#define __ASSUME_IMPL(x)			AssertIfFailed(LIKELY(x))
+#define __ASSUME_IMPL(x)			AssertIfFailed(LIKELY(x), __FILE__, __LINE__, "Assumption failed: " ## x)
 #undef __DBG_INCREMENT_IMPL
 #define __DBG_INCREMENT_IMPL(x)	++(x)
 #undef __UNREACHABLE_IMPL
-#define __UNREACHABLE_IMPL			AssertIfFailed(false)
+#define __UNREACHABLE_IMPL			AssertIfFailed(false, __FILE__, __LINE__, "Unreachable code reached")
 
 #endif
 
