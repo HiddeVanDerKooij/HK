@@ -1,4 +1,5 @@
 add_library(HK
+	Delegate.cpp
 	Allocators/Memory.cpp
 	Allocators/Memory.h
 	Allocators/Pool.h
