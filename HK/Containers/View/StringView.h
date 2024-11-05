@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Common/Types.h"
+#include "Containers/Array.h"
 
 class StringView
 {
@@ -38,6 +39,8 @@ public:
 	
 	StringView ChopLeft(uint32 count) const;
 	StringView ChopRight(uint32 count) const;
+	
+	Array<StringView> Split(char8 delimiter) const;
 	
 	bool ParseAsInt(int64& result, uint32 base) const;
 

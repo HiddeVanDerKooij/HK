@@ -177,6 +177,22 @@ StringView StringView::ChopRight(uint32 num) const
 	return StringView(StringData, StringSize - num);
 }
 
+Array<StringView> StringView::Split(char8 delimiter) const
+{
+	Array<StringView> result;
+	uint32 start = 0;
+	for (uint32 i=0; i<StringSize; ++i) {
+		if (StringData[i] == delimiter) {
+			result.Add(Substring(start, i - start));
+			start = i + 1;
+		}
+	}
+	if (start < StringSize) {
+		result.Add(Substring(start, StringSize - start));
+	}
+	return result;
+}
+
 bool StringView::ParseAsInt(int64& result, uint32 base) const
 {
 	CHECK(base >= 2 && base <= 36);
