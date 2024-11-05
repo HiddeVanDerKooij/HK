@@ -20,6 +20,7 @@ namespace Memory {
 	void Reallocate(void*& ptr, uint64 oldNumBytes, uint64 newNumBytes);
 	void Free(void* ptr, uint64 numBytes);
 	void FillZero(void* Start, uint64 numBytes);
+	void FillByte(void* Start, uint64 numBytes, uint8 value);
 
 	template<typename T, typename... P>
 	T* New(P&&... args) {

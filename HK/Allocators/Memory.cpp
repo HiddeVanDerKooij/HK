@@ -92,6 +92,59 @@ void Memory::FillZero(void* ptr, uint64 numBytes)
 	CHECK(numBytes == 0);
 }
 
+void Memory::FillByte(void* ptr, uint64 numBytes, uint8 value)
+{
+	CHECK(ptr != nullptr);
+	
+	// TODO (HvdK): First fill to alignment, then do this
+	
+	char8* cptr = reinterpret_cast<char8*>(ptr);
+	
+	uint64 value64 = value;
+	value64 |= (value64 << 8);
+	value64 |= (value64 << 16);
+	value64 |= (value64 << 32);
+	
+	while (numBytes >= 32)
+	{
+		uint64* ptr64 = reinterpret_cast<uint64*>(cptr);
+		ptr64[0] = value64;
+		ptr64[1] = value64;
+		ptr64[2] = value64;
+		ptr64[3] = value64;
+		cptr += 32;
+		numBytes -= 32;
+	}
+	while (numBytes >= 8)
+	{
+		uint64* ptr64 = reinterpret_cast<uint64*>(cptr);
+		*ptr64 = value64;
+		cptr += 8;
+		numBytes -= 8;
+	}
+	if (numBytes >= 4)
+	{
+		uint32* ptr32 = reinterpret_cast<uint32*>(cptr);
+		*ptr32 = uint32(value64);
+		cptr += 4;
+		numBytes -= 4;
+	}
+	if (numBytes >= 2)
+	{
+		uint16* ptr16 = reinterpret_cast<uint16*>(cptr);
+		*ptr16 = uint16(value64);
+		cptr += 2;
+		numBytes -= 2;
+	}
+	if (numBytes == 1)
+	{
+		*cptr = value;
+		--numBytes;
+	}
+	
+	CHECK(numBytes == 0);
+}
+
 void Memory::Move(const void* from, void* to, uint64 numBytes)
 {
 #ifdef MSVC
