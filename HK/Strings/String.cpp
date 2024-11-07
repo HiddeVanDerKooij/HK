@@ -7,11 +7,13 @@
 #include "Common/CompilerMacros.h"
 
 uint8 CurrentBuffer = 0;
-char8 Buffer[16][256] = { '\0' };
+const uint32 BufferCount = 16;
+const uint32 BufferSize = 256;
+char8 Buffer[BufferCount][BufferSize] = { '\0' };
 
 uint8 GetCurrentBufferIndexAndIncrement() {
 	uint8 result = CurrentBuffer;
-	CurrentBuffer = (CurrentBuffer + 1) % 16;
+	CurrentBuffer = (CurrentBuffer + 1) % BufferCount;
 	return result;
 }
 
@@ -352,9 +354,38 @@ StringView AnsiString::ConvertParam(const ::Format& v) {
 			break;
 	}
 	
+	CHECK(prefixLength + v.DesiredLength <= BufferSize - 1);
+	
 	switch (v.Type) {
+		case ::Format::FormatType::Decimal:
+		{
+			const char8* buffer = t;
+			StringView numeric = ConvertUnsignedInteger(v.Value);
+			if (numeric.Size() >= v.DesiredLength) {
+				return numeric;
+			}
+			if (v.PaddingCharAppend != '\0') {
+				uint8 l = v.DesiredLength - numeric.Size();
+				while (l-- > 0) {
+					*t++ = v.PaddingCharAppend;
+				}
+				return StringView(buffer, v.DesiredLength);
+			}
+			if (v.PaddingCharPrepend != '\0') {
+				uint8 l = v.DesiredLength - numeric.Size();
+				Memory::Move(buffer, t + l, numeric.Size());
+				while (l-- > 0) {
+					*t++ = v.PaddingCharPrepend;
+				}
+				*(t+numeric.Size()) = '\0';
+				return StringView(buffer, v.DesiredLength);
+			}
+			UNREACHABLE;
+			return numeric;
+		}
 		case ::Format::FormatType::Hex:
 		case ::Format::FormatType::HexColor:
+		{
 			uint8 l = v.DesiredLength;
 			while (l-- > 0) {
 				*t++ = v.PaddingCharPrepend;
@@ -369,7 +400,9 @@ StringView AnsiString::ConvertParam(const ::Format& v) {
 				value >>= 8;
 				t -= 2;
 			}
+			CHECK(prefixLength + v.DesiredLength * 2 <= BufferSize - 1);
 			return StringView(Buffer[GetCurrentBufferIndexAndIncrement()], prefixLength + v.DesiredLength * 2);
+		}
 		break;
 	}
 	UNREACHABLE;
