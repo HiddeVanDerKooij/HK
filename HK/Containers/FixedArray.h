@@ -8,10 +8,13 @@
 #include "Containers/View/ArrayView.h"
 #include "Algo/Sort.h"
 
+
 template<typename T, int N>
 class FixedArray {
 	static_assert(N > 0, "FixedArray size must be greater than 0");
 public:
+	static constexpr uint32 Size = N;
+
 	FixedArray();
 	FixedArray(const FixedArray<T, N>& other);
 	FixedArray(FixedArray<T, N>&& other);
@@ -49,8 +52,6 @@ public:
 	const T& operator[](uint32 index) const;
 	T& At(uint32 index);
 	const T& At(uint32 index) const;
-	
-	uint32 Size() const;
 	
 	T Data[N];
 };
@@ -117,10 +118,4 @@ const T& FixedArray<T, N>::At(uint32 index) const
 {
 	CHECK(index < N);
 	return Data[index];
-}
-
-template<typename T, int N>
-uint32 FixedArray<T, N>::Size() const
-{
-	return N;
 }
