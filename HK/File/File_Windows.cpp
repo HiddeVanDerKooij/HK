@@ -128,8 +128,9 @@ void File::SeekToEnd() {
 	
 	LARGE_INTEGER li;
 	li.QuadPart = 0;
-	SetFilePointerEx(FileHandlePtr, li, nullptr, FILE_END);
-	FilePos = GetSize();
+	LARGE_INTEGER lo;
+	SetFilePointerEx(FileHandlePtr, li, &lo, FILE_END);
+	FilePos = lo.QuadPart;
 }
 
 bool File::IsOpen() const {
