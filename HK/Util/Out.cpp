@@ -1,9 +1,19 @@
 // Copyright (c) 2023-2024, Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
-#include <iostream>
-
 #include "Out.h"
+
+#include "Common/CompilerMacros.h"
+
+// TODO (HvdK): Cleanup
+
+#if PLATFORM == PLATFORM_WINDOWS
+#include <Windows.h>
+#define PRINT(x) OutputDebugString(x)
+#else
+#include <iostream>
+#define PRINT(x) std::cout << x
+#endif
 
 void Out::Write(StringView str) {
 	WriteImpl(str, false);
@@ -35,5 +45,6 @@ void Out::WriteImpl(StringView str, bool bNewLine) {
 	else {
 		output = String::Format("{}"_sv, str);
 	}
-	std::cout << *output;
+	
+	PRINT(output.AsCString());
 }
