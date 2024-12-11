@@ -34,4 +34,15 @@ namespace Algo
 			}
 		}
 	}
+	
+	template<typename T>
+	int32 Find(const T* data, uint32 num, const T& value, bool(*compare)(const T&, const T&))
+	{
+		for (uint32 i = 0; i < num; ++i) {
+			if (compare(data[i], value)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 };

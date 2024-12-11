@@ -6,7 +6,7 @@
 #include "Common/CompilerMacros.h"
 #include "Common/Types.h"
 #include "Containers/View/ArrayView.h"
-#include "Algo/Sort.h"
+#include "Algo.h"
 
 
 template<typename T, int N>

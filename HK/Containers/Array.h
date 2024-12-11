@@ -10,7 +10,7 @@
 #include "Common/CompilerMacros.h"
 #include "Common/Types.h"
 #include "Containers/View/ArrayView.h"
-#include "Algo/Sort.h"
+#include "Algo.h"
 
 // TODO (HvdK): Reduce code generation by having a templated
 // array implementation that only worries about sizeof(T),
