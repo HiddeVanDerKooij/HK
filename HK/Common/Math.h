@@ -65,4 +65,11 @@ namespace Math {
 	O RoundToInt(T a) {
 		return RoundToIntImpl<T, O>::Exec(a);
 	};
+	
+	f32 Round(f32 a);
+	f64 Round(f64 a);
+	f32 Floor(f32 a);
+	f64 Floor(f64 a);
+	f32 Ceil(f32 a);
+	f64 Ceil(f64 a);
 }

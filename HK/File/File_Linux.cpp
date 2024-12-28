@@ -148,7 +148,7 @@ void File::Write(const uint8* buffer, uint64 size) {
 		return;
 	}
 	
-	write(FileHandle, buffer, size);
+	CHECK(write(FileHandle, buffer, size) != -1);
 	FilePos += size;
 }
 
@@ -157,7 +157,7 @@ void File::Write(StringView text) {
 		return;
 	}
 	
-	write(FileHandle, text.Data(), text.Size());
+	CHECK(write(FileHandle, text.Data(), text.Size()) != -1);
 	FilePos += text.Size();
 }
 

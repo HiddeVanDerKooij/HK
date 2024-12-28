@@ -13,7 +13,6 @@ add_library(HK
     Common/CompilerMacros.cpp
     Common/CompilerMacros.h
     Common/Math.cpp
-    Common/Math.h
     Common/Types.cpp
     Common/Types.h
     Common/Print.cpp
