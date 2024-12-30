@@ -31,7 +31,7 @@ public:
 	ArrayView(const ArrayView<T>& other) : GArrayView(other.ArrayData, other.ArraySize) {}
 	ArrayView(const Array<T>& source) : GArrayView(source.GetData(), source.Num()) {}
 	
-	ArrayView<T> ChopLeft(uint32 count) const { CheckIndex(count); return ArrayView<T>(&ConstData()[count], ArraySize - sizeof(T)*count); }
+	ArrayView<T> ChopLeft(uint32 count) const { CHECK(count > 0); CheckIndex(count - 1); return ArrayView<T>(&ConstData()[count], ArraySize - sizeof(T)*count); }
 	ArrayView<T> ChopRight(uint32 count) const { CheckIndex(count); return ArrayView<T>(ConstData(), ArraySize - sizeof(T)*count); }
 
 	const T& operator[](uint32 index) const { CheckIndex(index);  return ConstData()[index]; }

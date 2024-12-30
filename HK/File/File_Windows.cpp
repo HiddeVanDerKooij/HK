@@ -23,6 +23,7 @@ File::File(const FilePath& path) {
 
 File::~File() {
 	if (FileHandlePtr) {
+		//ERRORF("File '{}' was not closed before destruction"_sv, Path.AsView());
 		CloseHandle(FileHandlePtr);
 	}
 	FileHandlePtr = nullptr;

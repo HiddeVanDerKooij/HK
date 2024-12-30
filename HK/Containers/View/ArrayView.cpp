@@ -8,7 +8,7 @@
 GArrayView::GArrayView(const void* data, uint32 size)
 	: ArrayData(data), ArraySize(size)
 {
-	CHECK(data == nullptr && size == 0 || data != nullptr && size > 0);
+	CHECK(size == 0 || data != nullptr && size > 0);
 	CHECK(size < (1 << 30));
 }
 

@@ -244,7 +244,7 @@ T& Array<T>::AddDefaulted()
 }
 
 template<typename T>
-[[nodiscard]] T* Array<T>::AddUninitialized(uint32 num)
+T* Array<T>::AddUninitialized(uint32 num)
 {
 	RequireArrayMaxGrowth(ArrayNum + num);
 	T* result = &Data[ArrayNum];
