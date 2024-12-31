@@ -7,12 +7,20 @@
 
 // TODO (HvdK): Cleanup
 
+#ifdef _DEBUG_
+
 #if PLATFORM == PLATFORM_WINDOWS
 #include <Windows.h>
 #define PRINT(x) OutputDebugString(x)
 #else
 #include <iostream>
 #define PRINT(x) std::cout << x
+#endif
+
+#else
+
+#define PRINT(x)
+
 #endif
 
 void Out::Write(StringView str) {
