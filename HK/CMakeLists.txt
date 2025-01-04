@@ -4,6 +4,7 @@ project(HK VERSION 0.1.0)
 
 add_library(HK
 	Delegate.cpp
+	Random.cpp
 	Allocators/Memory.cpp
 	Allocators/Memory.h
 	Allocators/Pool.h
