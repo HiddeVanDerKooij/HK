@@ -176,3 +176,6 @@ void AssertFailed(const char* file, int line, const char* code);
 #define DBG_INCREMENT(x)	__DBG_INCREMENT_IMPL(x)
 
 #define ARRAY_COUNT(x)		(sizeof(x) / sizeof(x[0]))
+
+#define OFFSET_OF(__type, __member) ((size64)&reinterpret_cast<const volatile char&>((((__type*)0)->__member)))
+#define ADDRESS_OF(__type, __member) (&((__type*)0)->__member)

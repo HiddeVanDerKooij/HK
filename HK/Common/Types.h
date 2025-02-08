@@ -22,6 +22,18 @@ typedef int8 char8;
 typedef size_t size64;
 typedef uint64 uintptr;
 
+constexpr int8 LIMIT_INT8_MIN = -128;
+constexpr int8 LIMIT_INT8_MAX = 127;
+constexpr uint8 LIMIT_UINT8_MAX = 255;
+constexpr int16 LIMIT_INT16_MIN = -32768;
+constexpr int16 LIMIT_INT16_MAX = 32767;
+constexpr uint16 LIMIT_UINT16_MAX = 65535;
+constexpr int32 LIMIT_INT32_MIN = -2147483648;
+constexpr int32 LIMIT_INT32_MAX = 2147483647;
+constexpr uint32 LIMIT_UINT32_MAX = 4294967295U;
+constexpr int64 LIMIT_INT64_MIN = -9223372036854775807LL - 1;
+constexpr int64 LIMIT_INT64_MAX = 9223372036854775807LL;
+constexpr uint64 LIMIT_UINT64_MAX = 18446744073709551615ULL;
 
 constexpr uint32 INVALID_INDEX = 0xFFFFFFFF;
 

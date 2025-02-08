@@ -92,5 +92,3 @@ void Swap(T& a, T& b) {
 	a = Move(b);
 	b = Move(temp);
 }
-
-#define OFFSET_OF(type, member) static_cast<uint32>(reinterpret_cast<uintptr>(&(((type*)0)->member)))

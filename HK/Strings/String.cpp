@@ -169,9 +169,14 @@ const char8* AnsiString::AsCString() const {
 }
 
 void AnsiString::Trim() {
-	while (ArrayNum > 0 && Data[ArrayNum - 1] == ' ') {
-		--ArrayNum;
+	StringView trim = AsView().Trimmed();
+	
+	uint32 numTrimmed = (uint32)(trim.Data() - Data);
+	
+	if (numTrimmed > 0) {
+		Memory::Move(Data + numTrimmed, Data, ElementSize * ArrayNum);
 	}
+	ArrayNum = trim.Size();
 }
 
 AnsiString AnsiString::Repeated(const char8 c, uint32 count) {

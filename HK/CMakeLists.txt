@@ -11,19 +11,21 @@ add_library(HK
 	Allocators/StringPool.cpp
 	Allocators/StringPool.h
 	Bench/Bench.cpp
-    Common/CompilerMacros.cpp
-    Common/CompilerMacros.h
-    Common/Math.cpp
+	Common/CompilerMacros.cpp
+	Common/CompilerMacros.h
+	Common/Math.cpp
+	Common/StringUtil.cpp
 	Common/Types.cpp
-    Common/Types.h
-    Common/Print.cpp
-    Common/Print.h
+	Common/Types.h
+	Common/Print.cpp
+	Common/Print.h
 	Containers/View/ArrayView.cpp
 	Containers/View/ArrayView.h
 	Containers/View/StringView.cpp
 	Containers/View/StringView.h
 	Containers/Array.cpp
 	Containers/BitArray.cpp
+	File/CSV.cpp
 	File/File.cpp
 	File/File_Linux.cpp
 	File/File_Windows.cpp

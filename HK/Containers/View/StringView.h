@@ -5,6 +5,7 @@
 
 #include "Common/Types.h"
 #include "Containers/Array.h"
+#include "Common/StringUtil.h"
 
 class StringView
 {
@@ -36,6 +37,8 @@ public:
 	StringView Substring(uint32 offset, uint32 length) const;
 	StringView SubstringSlow(uint32 offset, uint32 length) const;
 	uint32 CountChar(char8 c) const;
+	StringView Trimmed() const;
+	void Trim();
 	
 	StringView ChopLeft(uint32 count) const;
 	StringView ChopRight(uint32 count) const;

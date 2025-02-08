@@ -3,6 +3,7 @@
 
 #include "Allocators/Memory.h"
 #include "Common/CompilerMacros.h"
+#include "Common/StringUtil.h"
 #include "Containers/View/StringView.h"
 
 static const char8* empty = "";
@@ -165,6 +166,24 @@ uint32 StringView::CountChar(char8 c) const
 	return count;
 }
 
+StringView StringView::Trimmed() const
+{
+	StringView copy = *this;
+	copy.Trim();
+	return copy;
+}
+
+void StringView::Trim()
+{
+	while (StringSize > 0 && StringUtil::IsWhitespace(StringData[0])) {
+		++StringData;
+		--StringSize;
+	}
+	while (StringSize > 0 && StringUtil::IsWhitespace(StringData[StringSize - 1])) {
+		--StringSize;
+	}
+}
+
 StringView StringView::ChopLeft(uint32 num) const
 {
 	CHECK(num <= StringSize);
@@ -196,6 +215,7 @@ Array<StringView> StringView::Split(char8 delimiter) const
 bool StringView::ParseAsInt(int64& result, uint32 base) const
 {
 	CHECK(base >= 2 && base <= 36);
+	if (UNLIKELY(StringSize == 0)) return false;
 	result = 0;
 	uint32 i = 0;
 	bool negative = false;

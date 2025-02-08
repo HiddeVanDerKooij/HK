@@ -221,6 +221,8 @@ bool Memory::StringEquals(const StringView& a, const StringView& b)
 {
 	if (a.Size() != b.Size())
 		return false;
+	if (a.Data() == b.Data())
+		return true;
 	return Memory::Equals(a.Data(), b.Data(), a.Size());
 }
 
