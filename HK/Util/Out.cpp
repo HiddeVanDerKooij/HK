@@ -12,6 +12,7 @@
 #if PLATFORM == PLATFORM_WINDOWS
 #include <Windows.h>
 #define PRINT(x) OutputDebugString(x)
+#include <iostream>
 #else
 #include <iostream>
 #define PRINT(x) std::cout << x
@@ -45,7 +46,7 @@ void Out::WriteEnvironment() {
 
 void Out::WriteImpl(StringView str, bool bNewLine) {
 
-	String output = String();
+	String output = String(str.Size() + 3);
 
 	if (bNewLine) {
 		output = String::Format("{}\n"_sv, str);
@@ -54,5 +55,6 @@ void Out::WriteImpl(StringView str, bool bNewLine) {
 		output = String::Format("{}"_sv, str);
 	}
 	
-	PRINT(output.AsCString());
+	//PRINT(output.AsCString());
+	std::cout << output.AsCString();
 }

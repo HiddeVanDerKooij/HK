@@ -1,3 +1,6 @@
+// Copyright (c) 2024-2025, Hidde van der Kooij
+// SPDX-License-Identifier: BSD-2-Clause
+
 #include "Random.h"
 
 using namespace Random;
