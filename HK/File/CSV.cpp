@@ -32,6 +32,8 @@ bool GCSVReader::ParseHeader(StringView& csv, Array<int32>& outPropertyIndices) 
 {
 	ScopeBenchmark _f("GCSV::ParseHeader"_sv);
 	
+	LastError = StringView();
+	
 	int32 firstLine = csv.LeftFind('\n');
 	if (firstLine == -1)
 	{
@@ -95,9 +97,11 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 	const void* classDefault, const Array<int32>& propertyIndices, bool& bError) const
 {
 	int32 rowEnd = csv.LeftFind('\n');
+	int32 lineEnd = rowEnd + 1;
 	if (rowEnd == -1)
 	{
-		rowEnd = csv.Size() - 1;
+		rowEnd = csv.Size();
+		lineEnd = rowEnd;
 	}
 	
 	if (rowEnd <= 0)
@@ -107,7 +111,7 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 	}
 	
 	StringView row = csv.Substring(0, rowEnd);
-	csv = csv.ChopLeft(rowEnd + 1);
+	csv = csv.ChopLeft(lineEnd);
 	
 	uint32 currentColumn = 0;
 	
@@ -181,7 +185,6 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 		{
 			// Parsing a regular cell
 			int32 comma = row.LeftFind(',');
-			int32 newline;
 			if (comma == -1)
 			{
 				cell = row;
@@ -246,7 +249,14 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 						return false;
 					}
 					
-					value.i = (int32)result;
+					if (property.Type == EPropertyType::Int32)
+					{
+						value.i = (int32)result;
+					}
+					else
+					{
+						value.u = (uint32)result;
+					}
 				}
 				propertyBytes = 4;
 			}

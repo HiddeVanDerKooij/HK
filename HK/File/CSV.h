@@ -75,7 +75,7 @@ public:
 	void AddProperty(StringView column, EPropertyMissingRules missingRule, const f32* address);
 	void AddProperty(StringView column, EPropertyMissingRules missingRule, const StringView* address);
 	
-	Array<T> GetRows(StringView csv) const;
+	Array<T> GetRows(StringView csv, uint32 skipRows) const;
 };
 
 template<typename T>
@@ -103,7 +103,7 @@ void CSVReader<T>::AddProperty(StringView column, EPropertyMissingRules missingR
 }
 
 template<typename T>
-Array<T> CSVReader<T>::GetRows(StringView csv) const
+Array<T> CSVReader<T>::GetRows(StringView csv, uint32 skipRows) const
 {
 	// ScopeBenchmark _f("CSVReader<T>::GetRows"_sv);
 	
@@ -111,6 +111,18 @@ Array<T> CSVReader<T>::GetRows(StringView csv) const
 	if (!ParseHeader(csv, propertyIndices))
 	{
 		return Array<T>();
+	}
+	
+	while (skipRows > 0)
+	{
+		--skipRows;
+		
+		int32 rowEnd = csv.LeftFind('\n');
+		if (rowEnd == -1)
+		{
+			return Array<T>();
+		}
+		csv = csv.ChopLeft(rowEnd + 1);
 	}
 	
 	Array<T> result;
