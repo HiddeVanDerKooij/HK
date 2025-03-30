@@ -68,6 +68,9 @@ public:
 	// pointer to the first one.
 	T* AddUninitialized(uint32 num);
 	void AddRange(const ArrayView<T>& items);
+	void InsertAt(uint32 index, const T& item);
+	void InsertAt(uint32 index, T&& item);
+	void InsertRangeAt(uint32 index, const ArrayView<T>& items);
 	void RemoveAt(uint32 index);
 	void RemoveAtSwap(uint32 index);
 	T&& Pop();
@@ -94,6 +97,8 @@ public:
 
 	T* GetData();
 	const T* GetData() const;
+	
+	ArrayView<T> View() const;
 	
 	T* begin() { return Data; }
 	T* end() { return Data + ArrayNum; }
@@ -264,6 +269,50 @@ void Array<T>::AddRange(const ArrayView<T>& items)
 }
 
 template<typename T>
+void Array<T>::InsertAt(uint32 index, const T& item)
+{
+	CHECK(index <= ArrayNum);
+	RequireArrayMaxGrowth(ArrayNum + 1);
+	
+	if (UNLIKELY(index < ArrayNum)) {
+		int32 numElementsToMove = ArrayNum - index;
+		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
+	}
+	new (&Data[index]) T(item);
+	++ArrayNum;
+}
+
+template<typename T>
+void Array<T>::InsertAt(uint32 index, T&& item)
+{
+	CHECK(index <= ArrayNum);
+	RequireArrayMaxGrowth(ArrayNum + 1);
+	
+	if (UNLIKELY(index < ArrayNum)) {
+		int32 numElementsToMove = ArrayNum - index;
+		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
+	}
+	new (&Data[index]) T(Move(item));
+	++ArrayNum;
+}
+
+template<typename T>
+void Array<T>::InsertRangeAt(uint32 index, const ArrayView<T>& items)
+{
+	CHECK(index <= ArrayNum);
+	RequireArrayMaxGrowth(ArrayNum + items.Size());
+	
+	if (UNLIKELY(index < ArrayNum)) {
+		int32 numElementsToMove = ArrayNum - index;
+		Memory::Move(&Data[index], &Data[index + items.Size()], ElementSize * numElementsToMove);
+	}
+	for (uint32 i = 0; i < items.Size(); ++i) {
+		new (&Data[index + i]) T(items[i]);
+	}
+	ArrayNum += items.Size();
+}
+
+template<typename T>
 void Array<T>::RemoveAt(uint32 index)
 {
 	CHECK(IsValidIndex(index));
@@ -390,6 +439,12 @@ template<typename T>
 const T* Array<T>::GetData() const
 {
 	return Data;
+}
+
+template<typename T>
+ArrayView<T> Array<T>::View() const
+{
+	return ArrayView<T>(Data, ArrayNum);
 }
 
 template<typename T>
