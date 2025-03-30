@@ -149,7 +149,7 @@ uint64 File::Read(uint8* buffer, uint64 size) {
 	return bytesRead;
 }
 
-void File::Write(const uint8* buffer, uint64 size) {
+void File::Write(const void* buffer, uint64 size) {
 	if (!FileHandle && bOpenWrite) {
 		return;
 	}

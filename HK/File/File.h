@@ -33,7 +33,7 @@ public:
 	bool IsWritable() const;
 	
 	uint64 Read(uint8* buffer, uint64 size);
-	void Write(const uint8* buffer, uint64 size);
+	void Write(const void* buffer, uint64 size);
 	void Write(StringView text);
 	
 	void Flush();

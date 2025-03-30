@@ -16,7 +16,7 @@ struct HashMapEntry {
 		, Value(TValue())
 	{}
 	
-	void Hash(Hasher<uint32>& hasher) const {
+	void Hash(Hasher& hasher) const {
 		hasher.HashItem(Key);
 	}
 	

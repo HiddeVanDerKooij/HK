@@ -5,7 +5,6 @@
 
 #include "Common/Types.h"
 #include "Containers/Array.h"
-#include "Common/StringUtil.h"
 
 class StringView
 {

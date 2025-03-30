@@ -20,7 +20,7 @@ constexpr f32 SetMaxLoadFactor = 0.75f;
 template<typename T>
 class Set {
 public:
-	typedef Hasher<uint32> HasherType;
+	typedef Hasher HasherType;
 	
 	Set();
 	Set(uint32 initialSize);
@@ -169,7 +169,7 @@ uint32 Set<T>::AddGetIndex(const T& item)
 template<typename T>
 bool Set<T>::Remove(const T& item)
 {
-	const uint32 hash = HasherType::Hash(item);
+	const uint32 hash = HasherType::Hash<uint32>(item);
 	uint32 index = hash % Capacity;
 	const uint32 startIndex = index;
 	do {
@@ -263,7 +263,7 @@ int32 Set<T>::FindIndex(const T& item) const
 	if (UNLIKELY(Entries == nullptr)) {
 		return -1;
 	}
-	const uint32 hash = HasherType::Hash(item);
+	const uint32 hash = HasherType::Hash<uint32>(item);
 	uint32 index = hash % Capacity;
 	const uint32 startIndex = index;
 	do {
@@ -287,7 +287,7 @@ bool Set<T>::AddImpl(const T& item, uint32* outIndex)
 	if (UNLIKELY(NumEntries >= SetMaxLoadFactor * Capacity)) {
 		Rehash(Capacity * 2);
 	}
-	const uint32 hash = HasherType::Hash(item);
+	const uint32 hash = HasherType::Hash<uint32>(item);
 	uint32 index = hash % Capacity;
 	const uint32 startIndex = index;
 	do {

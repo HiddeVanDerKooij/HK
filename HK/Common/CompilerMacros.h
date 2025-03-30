@@ -30,6 +30,12 @@ void AssertFailed(const char* file, int line, const char* code);
 #define BUILD_TYPE BUILD_TYPE_RELEASE
 #endif
 
+#ifndef BUILD_TYPE
+#define BUILD_TYPE BUILD_TYPE_UNKNOWN
+#define BUILD_TYPE_STR "UNKNOWN"
+#endif
+
+
 #ifdef _MSC_VER
 #define MSVC
 #define COMPILER_VENDOR "MSVC"
@@ -44,9 +50,7 @@ void AssertFailed(const char* file, int line, const char* code);
 #define PLATFORM_STRING "Linux"
 #endif
 
-#ifndef BUILD_TYPE
-#define BUILD_TYPE BUILD_TYPE_UNKNOWN
-#define BUILD_TYPE_STR "UNKNOWN"
+#ifndef PLATFORM_STRING
 #define PLATFORM_STRING "Unknown"
 #endif
 

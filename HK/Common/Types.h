@@ -6,6 +6,9 @@
 // TODO (HvdK): G++ wants this file here
 #include <stddef.h>
 
+// Some forward declarations
+class StringView;
+
 typedef long long int64;
 typedef unsigned long long uint64;
 typedef int int32;

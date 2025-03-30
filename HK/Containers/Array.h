@@ -202,11 +202,13 @@ void Array<T>::Add(T&& item)
 template<typename T>
 void Array<T>::Reset()
 {
-	while (ArrayNum > 0)
+	uint32 num = ArrayNum;
+	while (num > 0)
 	{
-		DestroyAt(ArrayNum-1);
-		--ArrayNum;
+		--num;
+		DestroyAt(num);
 	}
+	ArrayNum = 0;
 }
 
 template<typename T>

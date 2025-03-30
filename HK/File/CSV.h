@@ -25,6 +25,7 @@ public:
 protected:
 	enum class EPropertyType
 	{
+		Bool,
 		Int32,
 		UInt32,
 		Float,
@@ -37,7 +38,7 @@ protected:
 	// Stores the error in a global variable you can get with
 	// GetError()
 	// Mutates csv to point to the first row
-	bool ParseHeader(StringView& csv, Array<int32>& outPropertyIndices) const;
+	bool ParseHeader(StringView& csv, Array<int32>& outPropertyIndices, uint32 skipRows) const;
 	bool ParseRow(StringView& csv, uint32 rowCount, void* data, const void* classDefault, const Array<int32>& propertyIndices, bool& bError) const;
 	
 public:
@@ -48,7 +49,7 @@ private:
 	{
 		StringView Name;
 		
-		void Hash(Hasher<uint32>& hasher) const;
+		void Hash(Hasher& hasher) const;
 		bool operator==(const ColumnName& other) const;
 	};
 
@@ -70,6 +71,7 @@ class CSVReader : public GCSVReader
 public:
 	typedef T PropertyType;
 	
+	void AddProperty(StringView column, EPropertyMissingRules missingRule, const bool* address);
 	void AddProperty(StringView column, EPropertyMissingRules missingRule, const int32* address);
 	void AddProperty(StringView column, EPropertyMissingRules missingRule, const uint32* address);
 	void AddProperty(StringView column, EPropertyMissingRules missingRule, const f32* address);
@@ -77,6 +79,12 @@ public:
 	
 	Array<T> GetRows(StringView csv, uint32 skipRows) const;
 };
+
+template<typename T>
+void CSVReader<T>::AddProperty(StringView column, EPropertyMissingRules missingRule, const bool* address)
+{
+	AddPropertyInternal(column, address, EPropertyType::Bool, missingRule);
+}
 
 template<typename T>
 void CSVReader<T>::AddProperty(StringView column, EPropertyMissingRules missingRule, const int32* address)
@@ -108,21 +116,9 @@ Array<T> CSVReader<T>::GetRows(StringView csv, uint32 skipRows) const
 	// ScopeBenchmark _f("CSVReader<T>::GetRows"_sv);
 	
 	Array<int32> propertyIndices;
-	if (!ParseHeader(csv, propertyIndices))
+	if (!ParseHeader(csv, propertyIndices, skipRows))
 	{
 		return Array<T>();
-	}
-	
-	while (skipRows > 0)
-	{
-		--skipRows;
-		
-		int32 rowEnd = csv.LeftFind('\n');
-		if (rowEnd == -1)
-		{
-			return Array<T>();
-		}
-		csv = csv.ChopLeft(rowEnd + 1);
 	}
 	
 	Array<T> result;

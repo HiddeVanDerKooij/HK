@@ -5,7 +5,6 @@
 
 #include "Common/Types.h"
 
-template<typename V>
 class Hasher {
 public:
 	Hasher();
@@ -13,9 +12,10 @@ public:
 	template<typename U>
 	void Add(const U& v);
 	
+	template<typename V>
 	V Get() const;
 	
-	template<typename T>
+	template<typename V, typename T>
 	static V Hash(const T& item);
 	
 	template<typename T>
@@ -24,20 +24,14 @@ public:
 	void HashItem(const uint16& item);
 	void HashItem(const uint32& item);
 	void HashItem(const uint64& item);
+	void HashItem(const StringView& item);
 
 protected:
 	uint64 State;
 };
 
-template<typename V>
-Hasher<V>::Hasher()
-{
-	State = 0xFF51AFD7ED558CCD;
-}
-
-template<typename V>
 template<typename U>
-void Hasher<V>::Add(const U& v)
+void Hasher::Add(const U& v)
 {
 	const uint8* p = reinterpret_cast<const uint8*>(&v);
 	uint32 size = sizeof(U);
@@ -63,7 +57,7 @@ void Hasher<V>::Add(const U& v)
 }
 
 template<typename V>
-V Hasher<V>::Get() const
+V Hasher::Get() const
 {
 	static_assert(sizeof(State) >= sizeof(V));
 	uint32 multiple = sizeof(State) / sizeof(V);
@@ -77,42 +71,16 @@ V Hasher<V>::Get() const
 	return output;
 }
 
-template<typename V>
-template<typename T>
-V Hasher<V>::Hash(const T& item)
+template<typename V, typename T>
+V Hasher::Hash(const T& item)
 {
-	Hasher<V> hasher;
+	Hasher hasher;
 	hasher.HashItem(item);
-	return hasher.Get();
+	return hasher.Get<V>();
 }
 
-template<typename V>
 template<typename T>
-void Hasher<V>::HashItem(const T& item)
+void Hasher::HashItem(const T& item)
 {
 	item.Hash(*this);
-}
-
-template<typename V>
-void Hasher<V>::HashItem(const uint8& item)
-{
-	Add(item);
-}
-
-template<typename V>
-void Hasher<V>::HashItem(const uint16& item)
-{
-	Add(item);
-}
-
-template<typename V>
-void Hasher<V>::HashItem(const uint32& item)
-{
-	Add(item);
-}
-
-template<typename V>
-void Hasher<V>::HashItem(const uint64& item)
-{
-	Add(item);
 }

@@ -3,6 +3,7 @@
 
 #include "CSV.h"
 #include "Bench/Bench.h"
+#include "Common/StringUtil.h"
 
 static String LastError;
 
@@ -28,7 +29,7 @@ void GCSVReader::AddPropertyInternal(StringView columnname,
 	Properties.Add(property);
 }
 
-bool GCSVReader::ParseHeader(StringView& csv, Array<int32>& outPropertyIndices) const
+bool GCSVReader::ParseHeader(StringView& csv, Array<int32>& outPropertyIndices, uint32 skipRows) const
 {
 	ScopeBenchmark _f("GCSV::ParseHeader"_sv);
 	
@@ -90,6 +91,18 @@ bool GCSVReader::ParseHeader(StringView& csv, Array<int32>& outPropertyIndices) 
 		}
 	}
 	
+	while (skipRows > 0)
+	{
+		--skipRows;
+		
+		int32 rowEnd = csv.LeftFind('\n');
+		if (rowEnd == -1)
+		{
+			return false;
+		}
+		csv = csv.ChopLeft(rowEnd + 1);
+	}
+	
 	return true;
 }
 
@@ -106,7 +119,7 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 	
 	if (rowEnd <= 0)
 	{
-		// End of file
+		// End of content
 		return false;
 	}
 	
@@ -214,6 +227,7 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 			}
 			
 			union {
+				bool b;
 				int32 i;
 				uint32 u;
 				f32 f;
@@ -223,8 +237,39 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 			uint8 propertyBytes = 0;
 			bool bParsed = true;
 			
-			if (property.Type == EPropertyType::Int32 ||
-				property.Type == EPropertyType::UInt32)
+			if (property.Type == EPropertyType::Bool)
+			{
+				if (cell == "1"_sv ||
+					StringUtil::IsEqualCaseInsensitive(cell, "true"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "yes"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "y"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "on"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "enabled"_sv))
+				{
+					value.b = true;
+				}
+				else if (cell == "0"_sv ||
+					StringUtil::IsEqualCaseInsensitive(cell, "false"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "no"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "n"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "off"_sv) ||
+					StringUtil::IsEqualCaseInsensitive(cell, "disabled"_sv))
+				{
+					value.b = false;
+				}
+				else
+				{
+					bParsed = false;
+					if (bRequired)
+					{
+						bError = true;
+						LastError = String::Format("Cannot parse '{}' as bool"_sv, cell);
+						return false;
+					}
+				}
+			}
+			else if (property.Type == EPropertyType::Int32 ||
+					property.Type == EPropertyType::UInt32)
 			{
 				int64 result = 0;
 				if (!cell.ParseAsInt(result, 10))
@@ -288,6 +333,7 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 			else
 			{
 				bError = true;
+				CHECK(false && "Unknown property type");
 				LastError = "Unknown property type"_sv;
 				return false;
 			}
@@ -321,7 +367,7 @@ StringView GCSVReader::GetError()
 	return LastError.AsView();
 }
 
-void GCSVReader::ColumnName::Hash(Hasher<uint32>& hasher) const
+void GCSVReader::ColumnName::Hash(Hasher& hasher) const
 {
 	hasher.Add(Name.Size());
 	const char8* ptr = Name.Data();

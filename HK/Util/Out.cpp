@@ -45,7 +45,7 @@ void Out::WriteEnvironment() {
 }
 
 void Out::WriteImpl(StringView str, bool bNewLine) {
-
+	// TODO (HvdK): Optimize
 	String output = String(str.Size() + 3);
 
 	if (bNewLine) {
@@ -55,6 +55,5 @@ void Out::WriteImpl(StringView str, bool bNewLine) {
 		output = String::Format("{}"_sv, str);
 	}
 	
-	//PRINT(output.AsCString());
-	std::cout << output.AsCString();
+	PRINT(output.AsCString());
 }
