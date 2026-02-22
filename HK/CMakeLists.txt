@@ -6,6 +6,7 @@ add_library(HK
 	Delegate.cpp
 	Random.cpp
 	Allocators/Memory.cpp
+	Allocators/StaticArena.cpp
 	Allocators/StringPool.cpp
 	Bench/Bench.cpp
 	Common/CompilerMacros.cpp

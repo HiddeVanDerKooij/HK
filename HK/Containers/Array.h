@@ -3,9 +3,6 @@
 
 #pragma once
 
-// TODO (HvdK): Find a way to avoid including this header
-#include <new>
-
 #include "Allocators/Memory.h"
 #include "Common/CompilerMacros.h"
 #include "Common/Types.h"
@@ -27,7 +24,6 @@ static uint32 CalculateArrayMaxGrowth(uint32 oldcap, uint32 newcap)
 	}
 	return newcap;
 };
-
 
 template<typename T>
 class Array {
@@ -194,14 +190,14 @@ template<typename T>
 void Array<T>::Add(const T& item)
 {
 	RequireArrayMaxGrowth(ArrayNum + 1);
-	new (&Data[ArrayNum++]) T(item);
+	*(&Data[ArrayNum++]) = T(item);
 }
 
 template<typename T>
 void Array<T>::Add(T&& item)
 {
 	RequireArrayMaxGrowth(ArrayNum + 1);
-	new (&Data[ArrayNum++]) T(Move(item));
+	*(&Data[ArrayNum++]) = T(Move(item));
 }
 
 template<typename T>
@@ -278,7 +274,7 @@ void Array<T>::InsertAt(uint32 index, const T& item)
 		int32 numElementsToMove = ArrayNum - index;
 		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
 	}
-	new (&Data[index]) T(item);
+	*(&Data[index]) = T(item);
 	++ArrayNum;
 }
 
@@ -292,7 +288,7 @@ void Array<T>::InsertAt(uint32 index, T&& item)
 		int32 numElementsToMove = ArrayNum - index;
 		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
 	}
-	new (&Data[index]) T(Move(item));
+	*(&Data[index]) = T(Move(item));
 	++ArrayNum;
 }
 
@@ -307,7 +303,7 @@ void Array<T>::InsertRangeAt(uint32 index, const ArrayView<T>& items)
 		Memory::Move(&Data[index], &Data[index + items.Size()], ElementSize * numElementsToMove);
 	}
 	for (uint32 i = 0; i < items.Size(); ++i) {
-		new (&Data[index + i]) T(items[i]);
+		*(&Data[index + i]) = T(items[i]);
 	}
 	ArrayNum += items.Size();
 }

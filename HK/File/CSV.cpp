@@ -1,6 +1,7 @@
 // Copyright (c) 2025, Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
+#include "Common/Types.h"
 #include "CSV.h"
 #include "Bench/Bench.h"
 #include "Common/StringUtil.h"
@@ -284,8 +285,8 @@ bool GCSVReader::ParseRow(StringView& csv, uint32 rowCount, void* data,
 				}
 				else
 				{
-					int64 min = int64(property.Type == EPropertyType::Int32 ? LIMIT_INT32_MIN : 0);
-					int64 max = int64(property.Type == EPropertyType::Int32 ? LIMIT_INT32_MAX : LIMIT_UINT32_MAX);
+					int64 min = int64(property.Type == EPropertyType::Int32 ? (Traits::Limits<int32>::Min) : 0);
+					int64 max = int64(property.Type == EPropertyType::Int32 ? (Traits::Limits<int32>::Max) : (Traits::Limits<uint32>::Max));
 					
 					if (result < min || result > max)
 					{

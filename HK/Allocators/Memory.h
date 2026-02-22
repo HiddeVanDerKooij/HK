@@ -5,9 +5,40 @@
 
 #include "Common/Types.h"
 
-#include <utility>
-
 class StringView;
+
+
+template<typename T>
+struct RemoveReference {
+	typedef T Type;
+};
+
+template<typename T>
+struct RemoveReference<T&> {
+	typedef T Type;
+};
+
+template<typename T>
+struct RemoveReference<T&&> {
+	typedef T Type;
+};
+
+template<typename T>
+typename RemoveReference<T>::Type&& Move(T&& arg) noexcept {
+	return static_cast<typename RemoveReference<T>::Type&&>(arg);
+}
+
+template<typename T>
+[[__nodiscard__]]
+T&& Forward(typename RemoveReference<T>::Type& arg) noexcept {
+	return static_cast<T&&>(arg);
+}
+
+template<typename T>
+[[__nodiscard__]]
+T&& Forward(typename RemoveReference<T>::Type&& arg) noexcept {
+	return static_cast<T&&>(arg);
+}
 
 namespace Memory {
 	void* Allocate(uint64 numBytes);
@@ -32,7 +63,7 @@ namespace Memory {
 		//return ptr;
 
 		// TODO (HvdK): Use the snippet above instead of this one.
-		return new T(std::forward<P>(args)...);
+		return new T(Forward<P>(args)...);
 	};
 
 	template<typename T>
@@ -47,7 +78,7 @@ namespace Memory {
 	void Copy(const T* from, T* to) {
 		Copy(from, to, sizeof(T));
 	};
-
+	
 	bool Equals(const void* a, const void* b, uint64 numBytes);
 	// TODO (HvdK): Make special aligned versions of these functions
 	bool StringEquals(const char8* a, const char8* b);
@@ -55,36 +86,6 @@ namespace Memory {
 	bool StringEquals(const StringView& a, const StringView& b);
 	uint32 StringSize(const char8* string);
 };
-
-template<typename T>
-struct RemoveReference {
-	typedef T Type;
-};
-
-template<typename T>
-struct RemoveReference<T&> {
-	typedef T Type;
-};
-
-template<typename T>
-struct RemoveReference<T&&> {
-	typedef T Type;
-};
-
-template<typename T>
-typename RemoveReference<T>::Type&& Move(T&& arg) noexcept {
-	return static_cast<typename RemoveReference<T>::Type&&>(arg);
-}
-
-template<typename T>
-T&& Forward(typename RemoveReference<T>::Type& arg) noexcept {
-	return static_cast<T&&>(arg);
-}
-
-template<typename T>
-T&& Forward(typename RemoveReference<T>::Type&& arg) noexcept {
-	return static_cast<T&&>(arg);
-}
 
 template<typename T>
 void Swap(T& a, T& b) {
