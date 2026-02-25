@@ -3,10 +3,26 @@
 
 #pragma once
 
+#include "Common/CompilerMacros.h"
 #include "Common/Types.h"
 
-class StringView;
+// We define placement new ourselves, to avoid dragging in many
+// other header files. However it is possibly already defined.
+#ifdef GCC
+#ifndef _NEW
+#define _NEW
+#define _HK_DEFINE_PLACEMENTNEW
+#endif
+#endif
 
+#ifdef _HK_DEFINE_PLACEMENTNEW
+inline void* operator new(size64, void* p) noexcept {
+   	return p;
+}
+inline void operator delete(void*, void*) noexcept {}
+#endif
+
+class StringView;
 
 template<typename T>
 struct RemoveReference {
@@ -52,6 +68,11 @@ namespace Memory {
 	void Free(void* ptr, uint64 numBytes);
 	void FillZero(void* Start, uint64 numBytes);
 	void FillByte(void* Start, uint64 numBytes, uint8 value);
+
+	template<typename T, typename... P>
+	T* PlacementNew(void* ptr, P&&... args) {
+		return (T*)(new(ptr) T(Forward<P>(args)...));
+	}
 
 	template<typename T, typename... P>
 	T* New(P&&... args) {

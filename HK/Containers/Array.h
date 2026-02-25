@@ -181,23 +181,25 @@ Array<T>::Array(ArrayView<T> other)
 template<typename T>
 Array<T>::~Array()
 {
-	Reset();
 	if (LIKELY(Data != nullptr))
+	{
+		Reset();
 		Free();
+	}
 }
 
 template<typename T>
 void Array<T>::Add(const T& item)
 {
 	RequireArrayMaxGrowth(ArrayNum + 1);
-	*(&Data[ArrayNum++]) = T(item);
+	Memory::PlacementNew<T>(&Data[ArrayNum++], item);
 }
 
 template<typename T>
 void Array<T>::Add(T&& item)
 {
 	RequireArrayMaxGrowth(ArrayNum + 1);
-	*(&Data[ArrayNum++]) = T(Move(item));
+	Memory::PlacementNew<T>(&Data[ArrayNum++], item);
 }
 
 template<typename T>
@@ -259,6 +261,7 @@ template<typename T>
 void Array<T>::AddRange(const ArrayView<T>& items)
 {
 	RequireArrayMaxGrowth(ArrayNum + items.Size());
+	ASSUME(ArrayNum+items.Size()<=ArrayMax);
 	for (uint32 i = 0; i < items.Size(); ++i) {
 		Add(items[i]);
 	}
@@ -274,7 +277,7 @@ void Array<T>::InsertAt(uint32 index, const T& item)
 		int32 numElementsToMove = ArrayNum - index;
 		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
 	}
-	*(&Data[index]) = T(item);
+	Memory::PlacementNew<T>(&Data[index], item);
 	++ArrayNum;
 }
 
@@ -288,7 +291,7 @@ void Array<T>::InsertAt(uint32 index, T&& item)
 		int32 numElementsToMove = ArrayNum - index;
 		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
 	}
-	*(&Data[index]) = T(Move(item));
+	Memory::PlacementNew<T>(&Data[index], Move(item));
 	++ArrayNum;
 }
 
@@ -303,7 +306,7 @@ void Array<T>::InsertRangeAt(uint32 index, const ArrayView<T>& items)
 		Memory::Move(&Data[index], &Data[index + items.Size()], ElementSize * numElementsToMove);
 	}
 	for (uint32 i = 0; i < items.Size(); ++i) {
-		*(&Data[index + i]) = T(items[i]);
+		Memory::PlacementNew<T>(&Data[index + i], items[i]);
 	}
 	ArrayNum += items.Size();
 }
@@ -415,7 +418,15 @@ Array<T>& Array<T>::operator=(Array<T>&& other)
 {
 	CHECK(this != &other);
 	if (LIKELY(Data != nullptr))
+	{
+		uint32 num = ArrayNum;
+		while (num > 0)
+		{
+			--num;
+			DestroyAt(num);
+		}
 		Free();
+	}
 
 	Data = other.Data;
 	ArrayNum = other.ArrayNum;
@@ -492,6 +503,7 @@ void Array<T>::Allocate(uint32 newcap)
 	CHECK(Data == nullptr);
 	ArrayMax = newcap;
 	Data = (T*)Memory::Allocate(newcap * ElementSize);
+	CHECK(Data != nullptr);
 }
 
 template<typename T>
@@ -505,6 +517,7 @@ void Array<T>::Reallocate(uint32 newcap)
 	Memory::Reallocate(data, oldsize, newsize);
 	Data = (T*)data;
 	ArrayMax = newcap;
+	CHECK(Data != nullptr);
 }
 
 template<typename T>
