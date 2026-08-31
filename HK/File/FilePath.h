@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -60,6 +60,12 @@ public:
 	StringView GetFilename() const;
 	StringView GetExtension() const;
 	StringView GetDirectory() const;
+
+	// Set the base of this FilePath to the other FilePath
+	// This is useful if this is a relative path but the
+	// CWD is in a different place. So we take our relative
+	// path onto the other path.
+	void BaseTo(const FilePath& other);
 	
 	FilePath operator/(StringView other) const;
 	FilePath operator/(FilePath other) const;

@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -89,6 +89,7 @@ HashMap<TKey, TValue>& HashMap<TKey, TValue>::operator=(HashMap&& other)
 	return *this;
 }
 
+// TODO (HvdK): Purpose of Add if we have FindOrAdd with the same signature?
 template<class TKey, class TValue>
 TValue& HashMap<TKey, TValue>::Add(const TKey& key)
 {

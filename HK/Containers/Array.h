@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -64,12 +64,21 @@ public:
 	// pointer to the first one.
 	T* AddUninitialized(uint32 num);
 	void AddRange(const ArrayView<T>& items);
+	// Returns true if item is added
+	bool AddUnique(const T& item);
+	// Returns true if item is added
+	bool AddUnique(T&& item);
 	void InsertAt(uint32 index, const T& item);
 	void InsertAt(uint32 index, T&& item);
+	// Returns the place of insertion
+	uint32 InsertAtPredicate(const T& item, int32 (*predicate)(const T& item, const T& other));
 	void InsertRangeAt(uint32 index, const ArrayView<T>& items);
 	void RemoveAt(uint32 index);
 	void RemoveAtSwap(uint32 index);
+	// Pop from the back
 	T&& Pop();
+	// Pop from the front
+	T&& PopFront();
 	uint32 Num() const;
 	void Reserve(uint32 num);
 	// Requires an exact size
@@ -268,12 +277,30 @@ void Array<T>::AddRange(const ArrayView<T>& items)
 }
 
 template<typename T>
+bool Array<T>::AddUnique(const T& item)
+{
+	if (Contains(item))
+		return false;
+	Add(item);
+	return true;
+}
+
+template<typename T>
+bool Array<T>::AddUnique(T&& item)
+{
+	if (Contains(item))
+		return false;
+	Add(item);
+	return true;
+}
+
+template<typename T>
 void Array<T>::InsertAt(uint32 index, const T& item)
 {
 	CHECK(index <= ArrayNum);
 	RequireArrayMaxGrowth(ArrayNum + 1);
 	
-	if (UNLIKELY(index < ArrayNum)) {
+	if (LIKELY(index < ArrayNum)) {
 		int32 numElementsToMove = ArrayNum - index;
 		Memory::Move(&Data[index], &Data[index + 1], ElementSize * numElementsToMove);
 	}
@@ -293,6 +320,54 @@ void Array<T>::InsertAt(uint32 index, T&& item)
 	}
 	Memory::PlacementNew<T>(&Data[index], Move(item));
 	++ArrayNum;
+}
+
+template<typename T>
+uint32 Array<T>::InsertAtPredicate(const T& item, int32 (*predicate)(const T& item, const T& other))
+{
+	if (ArrayNum == 0)
+	{
+		Add(item);
+		return 0;
+	}
+
+	uint32 rangeMin = 0;
+	uint32 rangeMax = ArrayNum;
+
+
+	while (true)
+	{
+		uint32 middle = (rangeMin + rangeMax) >> 1;
+		int32 result = predicate(item, Data[middle]);
+		if (result < 0) {
+			rangeMax = middle;
+
+			if ((rangeMax - rangeMin) <= 1)
+			{
+				result = predicate(item, Data[rangeMin]);
+				if (result>0) {
+					++rangeMin;
+				}
+				InsertAt(rangeMin, item);
+				return rangeMin;
+			}
+
+		} else if (result > 0) {
+			rangeMin = middle;
+
+			if ((rangeMax - rangeMin) <= 1)
+			{
+				if (result>0) {
+					++middle;
+				}
+				InsertAt(middle, item);
+				return middle;
+			}
+		} else {
+			InsertAt(middle, item);
+			return middle;
+		}
+	}
 }
 
 template<typename T>
@@ -345,6 +420,15 @@ T&& Array<T>::Pop()
 {
 	CHECK(ArrayNum > 0);
 	return Move(Data[--ArrayNum]);
+}
+
+template<typename T>
+T&& Array<T>::PopFront()
+{
+	CHECK(ArrayNum > 0);
+	T temp = Move(Data[0]);
+	RemoveAt(0);
+	return Move(temp);
 }
 
 template<typename T>
@@ -495,7 +579,6 @@ void Array<T>::InitEmpty()
 	ArrayNum = 0;
 	ArrayMax = 0;
 }
-
 
 template<typename T>
 void Array<T>::Allocate(uint32 newcap)

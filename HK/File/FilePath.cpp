@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #include "FilePath.h"
@@ -228,6 +228,18 @@ StringView FilePath::GetDirectory() const
 	return path.Substring(0, lastSlash + 1);
 }
 
+void FilePath::BaseTo(const FilePath& other)
+{
+	CHECK(IsRelative());
+	CHECK(other.IsDirectory());
+
+	String path = other.Path;
+	path += Path;
+
+	Path = path;
+	Canonicalize();
+}
+
 FilePath FilePath::operator/(StringView other) const
 {
 	return operator/(FilePath(other));
@@ -296,7 +308,18 @@ void FilePath::Canonicalize()
 	
 	for (uint32 i=components.Num()-1; i>0 && i < components.Num(); --i)
 	{
-		ScopeBenchmark bench("Component iteration"_sv);
+		ScopeBenchmark bench("Component iteration 1"_sv);
+		
+		StringView current = components[i];
+		if (current == "."_sv)
+		{
+			components.RemoveAt(i);
+		}
+	}
+
+	for (uint32 i=components.Num()-1; i>0 && i < components.Num(); --i)
+	{
+		ScopeBenchmark bench("Component iteration 2"_sv);
 		
 		StringView current = components[i];
 		
@@ -310,10 +333,6 @@ void FilePath::Canonicalize()
 				--i;
 				// TODO (HvdK): RemoveAtN(i-1, 2)
 			}
-		}
-		else if (current == "."_sv)
-		{
-			components.RemoveAt(i);
 		}
 	}
 	

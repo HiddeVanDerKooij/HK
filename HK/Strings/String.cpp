@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #include "Strings/String.h"
@@ -35,7 +35,7 @@ AnsiString::AnsiString(char8 c) : Array<char8>(1) {
 
 AnsiString::AnsiString(uint32 buffer) : Array<char8>(buffer) {}
 
-AnsiString::AnsiString(StringView view) : Array<char8>(view.Size()) {
+AnsiString::AnsiString(StringView view) : Array<char8>(view.Size()+1) {
 	if (LIKELY(view.Size() > 0)) {
 		Memory::Copy(view.Data(), Data, view.Size());
 	}

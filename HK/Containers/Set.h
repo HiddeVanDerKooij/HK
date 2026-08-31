@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Hidde van der Kooij
+// Copyright (c) Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
 #pragma once
@@ -35,7 +35,11 @@ public:
 	bool Add(const T& item);
 	uint32 AddGetIndex(const T& item);
 	bool Remove(const T& item);
+	// Empties and removes all allocation
 	void Clear();
+	// Empties but keeps the memory allocated
+	void Empty();
+	uint32 Num() const;
 	
 	T* Find(const T& item);
 	const T* Find(const T& item) const;
@@ -207,6 +211,25 @@ void Set<T>::Clear()
 	NumEntries = 0;
 }
 
+template<typename T>
+void Set<T>::Empty()
+{
+	if (LIKELY(Entries != nullptr)) {
+		for (uint32 i = 0; i < Capacity; ++i) {
+			if (Entries[i].IsUsed) {
+				Entries[i].IsUsed = false;
+				Entries[i].Item.~T();
+			}
+		}
+	}
+	NumEntries = 0;
+}
+
+template<typename T>
+uint32 Set<T>::Num() const
+{
+	return NumEntries;
+}
 
 template<typename T>
 T* Set<T>::Find(const T& item)
@@ -235,7 +258,9 @@ T& Set<T>::FindOrAdd(const T& item)
 	if (!!found) {
 		return *found;
 	}
-	return Entries[AddGetIndex(item)].Item;
+	uint32 index = AddGetIndex(item);
+	SetEntry<T>& entry = Entries[index];
+	return entry.Item;
 }
 
 
