@@ -74,6 +74,7 @@ void AssertFailed(const char* file, int line, const char* code);
 #define __UNREACHABLE_IMPL __assume(0)
 #define __PACK_START_IMPL __pragma(pack(push,1))
 #define __PACK_END_IMPL __pragma(pack(pop))
+#define __NODISCARD [[nodiscard]]
 
 #endif
 
@@ -88,6 +89,7 @@ void AssertFailed(const char* file, int line, const char* code);
 #define __PREFETCH_WRITE_IMPL(x) __builtin_prefetch((const void*)(x), 1, 1)
 #define __UNREACHABLE_IMPL __builtin_unreachable()
 #define __PACK_START_IMPL __attribute__((packed))
+#define __NODISCARD __attribute__((warn_unused_result))
 
 #endif
 
@@ -128,6 +130,9 @@ void AssertFailed(const char* file, int line, const char* code);
 #endif
 #ifndef __ASSERT_IMPL
 #define __ASSERT_IMPL(x) AssertIfFailed(LIKELY(x), __FILE__, __LINE__, #x)
+#endif
+#ifndef __NODISCARD
+#define __NODISCARD 
 #endif
 
 #ifndef BUILD_TYPE

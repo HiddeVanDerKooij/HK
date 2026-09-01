@@ -8,16 +8,24 @@
 
 // We define placement new ourselves, to avoid dragging in many
 // other header files. However it is possibly already defined.
-#ifdef GCC
+
+#define _HK_DEFINE_PLACEMENTNEW
+
+#ifndef _NEW
+
+#ifdef __PLACEMENT_NEW_INLINE // Defined in vcruntime_new.h
+#undef _HK_DEFINE_PLACEMENTNEW
+#endif
+
+#endif
+
 #ifndef _NEW
 #define _NEW
-#define _HK_DEFINE_PLACEMENTNEW
-#endif
 #endif
 
 #ifdef _HK_DEFINE_PLACEMENTNEW
 inline void* operator new(size64, void* p) noexcept {
-   	return p;
+	return p;
 }
 inline void operator delete(void*, void*) noexcept {}
 #endif
@@ -45,13 +53,13 @@ typename RemoveReference<T>::Type&& Move(T&& arg) noexcept {
 }
 
 template<typename T>
-[[__nodiscard__]]
+__NODISCARD
 T&& Forward(typename RemoveReference<T>::Type& arg) noexcept {
 	return static_cast<T&&>(arg);
 }
 
 template<typename T>
-[[__nodiscard__]]
+__NODISCARD
 T&& Forward(typename RemoveReference<T>::Type&& arg) noexcept {
 	return static_cast<T&&>(arg);
 }
@@ -68,10 +76,10 @@ namespace Memory {
 	void Free(void* ptr, uint64 numBytes);
 	void FillZero(void* Start, uint64 numBytes);
 	void FillByte(void* Start, uint64 numBytes, uint8 value);
-
+	
 	template<typename T, typename... P>
 	T* PlacementNew(void* ptr, P&&... args) {
-		return (T*)(new(ptr) T(Forward<P>(args)...));
+		return (T*)new(ptr) T(Forward<P>(args)...);
 	}
 
 	template<typename T, typename... P>

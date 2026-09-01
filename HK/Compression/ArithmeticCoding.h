@@ -58,7 +58,7 @@ public:
 					symbolIndex = model.ToIndex(values[pos]);
 				}
 				
-				const ArrayView<V> context = ArrayView(values.ConstData(), pos);
+				const ArrayView<V> context = ArrayView<V>(values.ConstData(), pos);
 				
 				const f32 terminatorProbability = model.GetTerminatorSymbolProbability(context);
 				CHECK(terminatorProbability >= 0.f);
@@ -104,7 +104,7 @@ public:
 		
 		BitArray encoded;
 		
-		for (int32 i=0; i<targetSymbols.Num(); ++i)
+		for (uint32 i=0; i<targetSymbols.Num(); ++i)
 		{
 			const auto& symbol = targetSymbols[i];
 			
@@ -161,7 +161,7 @@ public:
 		auto lGenerateSymbols = [&]()
 		{
 			candidateSymbols.Reset();
-			ArrayView<V> context = ArrayView(values);
+			ArrayView<V> context = ArrayView<V>(values);
 			f32 totalProbability = 0.f;
 			for (uint32 i=model.GetSymbolCount(); i>0;) {
 				--i;
@@ -253,7 +253,7 @@ public:
 					
 					rangeMin = rangeMin << 1;
 					rangeMax = (rangeMax << 1) | 1;
-					code = (code << 1) | lInputBit();
+					code = (code << 1) | (lInputBit() ? 1u : 0u);
 				}
 				return symbol->Symbol;
 			};

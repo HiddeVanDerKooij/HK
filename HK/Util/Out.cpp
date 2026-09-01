@@ -1,8 +1,6 @@
 // Copyright (c) 2023-2024, Hidde van der Kooij
 // SPDX-License-Identifier: BSD-2-Clause
 
-#include "Out.h"
-
 #include "Common/CompilerMacros.h"
 
 // TODO (HvdK): Cleanup
@@ -23,6 +21,10 @@
 #define PRINT(x)
 
 #endif
+
+// Moved below to avoid including Windows.h in the header file, namely
+// re-defining the (placement) new.
+#include "Out.h"
 
 void Out::Write(StringView str) {
 	WriteImpl(str, false);

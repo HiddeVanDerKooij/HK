@@ -50,11 +50,11 @@ int main()
 	
 	model.Symbols = symbols;
 	
-	ArrayView<char8> inputArrayView = ArrayView(input.Data(), input.Size());
+	ArrayView<char8> inputArrayView = ArrayView<char8>(input.Data(), input.Size());
 	BitArray encoded = ArithmeticCoding<Model, char8>::Encode(inputArrayView, model);
 	
 	std::cout << "Encoded size: " << encoded.GetBitCount() << std::endl;
-	for (int32 i=0; i<encoded.GetBitCount(); ++i) {
+	for (uint32 i=0; i<encoded.GetBitCount(); ++i) {
 		std::cout << (encoded.GetBit(i) ? "1" : "0");
 	}
 	
@@ -63,7 +63,7 @@ int main()
 	Array<char8> decoded = ArithmeticCoding<Model, char8>::Decode(encoded, model);
 	
 	std::cout << "Decoded size: " << decoded.Num() << std::endl;
-	for (int32 i=0; i<decoded.Num(); ++i) {
+	for (uint32 i=0; i<decoded.Num(); ++i) {
 		std::cout << decoded[i];
 	}	
 	
